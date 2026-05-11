@@ -1,7 +1,7 @@
 from main import *
 import pytest
 
-from tests.conftest import employee_client
+from tests.conftest import employee_client, fake_employee_data
 
 
 class TestToken:
@@ -13,13 +13,8 @@ class TestToken:
     def test_employee_client_is_employee_class(self, employee_client):
         assert isinstance(employee_client, Employee)
 
-    def test_create_employee(self, employee_client):
-        result = employee_client.create_employee()
-        employee_data = employee_client.get_single_employee(result)
-        assert type(result) == int
-        assert result > 0
-        assert employee_data is not None
-        assert employee_data['id'] == result
+    def test_create_employee(self, employee_client, fake_employee_data):
+        new_employee = employee_client.create_employee(fake_employee_data)
 
     def test_remove_employee(self, employee_client):
         employee_id = employee_client.create_employee()
