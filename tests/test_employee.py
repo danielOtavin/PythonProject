@@ -2,8 +2,8 @@ from main import Employee
 
 
 class TestEmployeePositive:
-    def test_create_employee_positive(self, fake_employee_data, admin_auth):
-        employee = Employee(admin_auth)
+    def test_create_employee_positive(self, fake_employee_data, admin_token):
+        employee = Employee(admin_token)
         result = employee.create_employee(fake_employee_data)
         assert result is not None
         assert isinstance(result, dict)
@@ -12,8 +12,8 @@ class TestEmployeePositive:
         assert 'salary' in result
         assert 'work' in result
 
-    def test_update_employee_data(self, fake_employee_data, update_employee_data, admin_auth):
-        client = Employee(admin_auth)
+    def test_update_employee_data(self, fake_employee_data, update_employee_data, admin_token):
+        client = Employee(admin_token)
         employee = client.create_employee(fake_employee_data)
         old_id = employee.get('id')
         old_name = employee.get('name')
@@ -23,8 +23,8 @@ class TestEmployeePositive:
         assert updated_employee.get('name') != old_name
         assert updated_employee.get('salary') != old_salary
 
-    def test_delete_employee(self, fake_employee_data, admin_auth):
-        employee = Employee(admin_auth)
+    def test_delete_employee(self, fake_employee_data, admin_token):
+        employee = Employee(admin_token)
         creation = employee.create_employee(fake_employee_data)
         employee_id = creation.get('id')
         assert employee.remove_employee(employee_id)
