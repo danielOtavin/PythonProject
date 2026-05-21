@@ -1,3 +1,4 @@
+
 import faker
 
 
@@ -7,7 +8,7 @@ class User:
     password: str
     
     @staticmethod
-    def from_dict(raw: dict) -> User:
+    def from_dict(raw: dict):
         return User(
             id=raw['id'],
             login= raw['login'],
@@ -15,7 +16,7 @@ class User:
         )
     
     @staticmethod
-    def random() -> User:
+    def random():
         fake = faker.Faker('ru_RU')
         return User(login=fake.email(), password=fake.password(length=12))
 
@@ -35,3 +36,4 @@ class User:
 ADMIN = User(login="admin", password="admin", id=1)
 TEST = User(login="example@mail.ru", password="some_long_password1234@@$_")
 ERROR = User(login="<unkown>", password="")
+

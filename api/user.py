@@ -2,7 +2,8 @@ import pytest
 import requests
 
 from config import Config
-from users import User
+from main import Token
+from users import User, ADMIN
 from api.base import auth_headers
 
 
@@ -36,3 +37,19 @@ class UserAPI:
              url=f"{Config.url}/users/{id}",
              headers=auth_headers(token),
         )
+
+    def update_role_raw(self, token: str, userId: int, role: str) -> requests.Response:
+        return requests.patch(
+            url=f'{Config.url}/users/{userId}/role/{role}',
+            headers=auth_headers(token)
+        )
+
+    def update_role(self, token: str, userId: int, role: str):
+        response = self.update_role_raw(token=token, role=role, userId=userId)
+
+        if response.status_code != 200:
+            pytest.fail(reason=f'Сервер ответил ошибкой {response.status_code}')
+
+        return response.json()['msg']
+
+

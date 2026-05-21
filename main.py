@@ -1,4 +1,3 @@
-from http.client import HTTPException
 from typing import Optional
 import requests
 
