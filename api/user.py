@@ -2,8 +2,7 @@ import pytest
 import requests
 
 from config import Config
-from main import Token
-from users import User, ADMIN
+from users import User
 from api.base import auth_headers
 
 

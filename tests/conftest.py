@@ -1,39 +1,14 @@
 from typing import Generator
 
 import pytest
+
+from api.company import CompanyAPI
+from api.employee import EmployeeAPI
 from api.token import Token
-import faker
 from api.user import UserAPI
+from companies import Company
+from employees import Employee
 from users import ADMIN, TEST, User
-
-
-@pytest.fixture(scope="module")
-def fake_employee_data():
-    fake = faker.Faker('ru_RU')
-    return {'name': fake.name(),
-            'salary': fake.random_int(1000, 2000),
-            'work': fake.boolean()}
-
-@pytest.fixture(scope="module")
-def update_employee_data():
-    fake = faker.Faker('ru_RU')
-    return {'name': fake.name(),
-            'salary': fake.random_int(1000, 2000),
-            'work': fake.boolean()}
-
-@pytest.fixture(scope="module")
-def fake_company_data():
-    fake = faker.Faker('ru_RU')
-    return {'name': fake.company(),
-            'country': fake.country(),
-            'year': fake.year()}
-
-@pytest.fixture(scope="module")
-def update_company_data():
-    fake = faker.Faker('ru_RU')
-    return {'name': fake.company(),
-            'country': fake.country(),
-            'year': fake.year()}
 
 @pytest.fixture(scope="session")
 def token_api() -> Generator[Token]:
@@ -42,6 +17,14 @@ def token_api() -> Generator[Token]:
 @pytest.fixture(scope="session")
 def user_api() -> Generator[UserAPI]:
     yield UserAPI()
+
+@pytest.fixture(scope="session")
+def employee_api() -> Generator[EmployeeAPI]:
+    yield EmployeeAPI()
+
+@pytest.fixture(scope="session")
+def company_api() -> Generator[CompanyAPI]:
+    yield CompanyAPI()
 
 
 @pytest.fixture(scope='session')
@@ -62,3 +45,23 @@ def random_user(user_api: UserAPI, admin_token: str) -> Generator[User]:
     yield user_created
     
     user_api.delete_raw(token=admin_token, id=user_created.id)
+
+@pytest.fixture(scope='function')
+def random_employee(employee_api: EmployeeAPI, admin_token: str) -> Generator[Employee]:
+    employee_to_create: Employee = Employee.random_employee()
+    employee_created = employee_api.create(token=admin_token, employee=employee_to_create)
+
+    yield employee_created
+
+    employee_api.delete_employee_raw(token=admin_token, employeeId=employee_created.id)
+
+@pytest.fixture(scope='function')
+def random_company(company_api: CompanyAPI, admin_token: str) -> Generator[Company]:
+    company_to_create: Company = Company.random_company()
+    company_created = company_api.create(token=admin_token, company=company_to_create)
+
+    yield company_created
+
+    company_api.delete_company_raw(token=admin_token, companyId=company_to_create.id)
+
+

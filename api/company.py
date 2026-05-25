@@ -6,7 +6,7 @@ from companies import Company
 from config import Config
 
 
-class CountryAPI:
+class CompanyAPI:
     def create_raw(self, token: str, company: Company) -> requests.Response:
         return requests.post(f'{Config.url}/companies',
                              headers=auth_headers(token),

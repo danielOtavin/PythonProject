@@ -3,18 +3,21 @@ import faker
 
 
 class Company:
+    id: int
     name: str
     year: int
     country: str
 
-    def __init__(self, name, year, country):
+    def __init__(self, name: str, year: int, country: str, id: int = -1):
+        self.id = id
         self.name = name
         self.year = year
         self.country = country
 
     @staticmethod
     def from_dict(raw: dict):
-        return Company(name=raw['name'],
+        return Company(id=raw['id'],
+                       name=raw['name'],
                        year=raw['year'],
                        country=raw['country']
                        )

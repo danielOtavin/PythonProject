@@ -15,7 +15,7 @@ class EmployeeAPI:
     def create(self, token: str, employee: Employee) -> Employee:
         response = self.create_raw(token, employee)
 
-        if response.status_code != 200:
+        if response.status_code != 201:
             pytest.fail(reason=f"Сервeр ответил с ошибкой: {response.status_code}")
 
         if not (employee_raw := response.json()):
@@ -29,7 +29,7 @@ class EmployeeAPI:
                                 headers=auth_headers(token),
                                 params={'limit': limit})
 
-    def get_employees(self, token: str, limit: int = 1):
+    def get_employees_all(self, token: str, limit: int = 1):
         response = self.get_employees_all_raw(token, limit)
         if response.status_code != 200:
             pytest.fail(reason=f"сервeр ответил с ошибкой: {response.status_code}")

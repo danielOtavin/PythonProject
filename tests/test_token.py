@@ -7,7 +7,7 @@ from config import Config
 from users import ADMIN, User
 
 
-class TestTokenPositive:
+class TestToken:
     def test_admin_token_positive(self, token_api: Token, random_user: User, user_api: UserAPI):
         response: requests.Response = token_api.get_token_raw(ADMIN)
         assert response.status_code == 200, f'Сервер ответил ошибкой: {response.status_code}'
@@ -15,14 +15,13 @@ class TestTokenPositive:
         assert admin_token, f'не пришёл токен'
         assert user_api.delete_raw(token=admin_token, id=random_user.id).status_code == 204, f'Админский токен невалидный'
 
-    def test_get_token_via_login(self, token_api, random_user):
+    def test_get_token_via_login(self, token_api, random_user, employee_api):
         new_user = random_user
         result = token_api.get_token_raw(new_user)
         assert result.status_code == 200
         token = result.json().get('token')
         assert token is not None
-        headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(f"{Config.url}/employees/all", headers=headers, params={"limit": 1})
+        response = employee_api.get_employees_all_raw(token=token)
         assert response.status_code == 200
 
     def test_get_token_from_deleted_user(self, random_user, token_api, admin_token):
@@ -75,10 +74,10 @@ class TestTokenPositive:
         result = requests.post(url=f"{Config.url}/token", headers={'Content-Type': 'text/plain'}, data=json.dumps(random_user.dict()))
         assert result.status_code == 400
 
-    def test_reusing_token_from_deleted_user(self, token_api, random_user, user_api, admin_token):
+    def test_reusing_token_from_deleted_user(self, token_api, random_user, user_api, admin_token, employee_api):
         user_token = token_api.get_token(random_user)
         user_api.delete_raw(token=admin_token, id=random_user.id)
-        result = requests.get(f"{Config.url}/employees/all", headers={'Authorization': f'Bearer {user_token}'})
+        result = employee_api.get_employees_all_raw(token=user_token)
         assert result.status_code == 401
 
 
