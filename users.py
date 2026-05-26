@@ -15,7 +15,7 @@ class User:
         )
     
     @staticmethod
-    def random():
+    def random_user():
         fake = faker.Faker('ru_RU')
         return User(login=fake.email(), password=fake.password(length=12))
 
@@ -29,6 +29,7 @@ class User:
             "login": self.login,
             "password": self.password,
         }
+
 
 
 

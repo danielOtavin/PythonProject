@@ -1,3 +1,5 @@
+from http.client import responses
+
 import pytest
 import requests
 
@@ -7,10 +9,10 @@ from api.base import auth_headers
 
 
 class UserAPI:
-    def create(self, user: User) -> User:
-        response = self.create_raw(user=user)
+    def create(self, user: User, token: str) -> User:
+        response = self.create_raw(user=user, token=token)
         
-        if response.status_code != 200:
+        if response.status_code != 201:
             pytest.fail(reason=f"сервeр ответил с ошибкой: {response.status_code}")
             
         if not (user_raw := response.json()):
@@ -18,9 +20,10 @@ class UserAPI:
 
         return User.from_dict(user_raw)
 
-    def create_raw(self, user: User) -> requests.Response:
+    def create_raw(self, user: User, token: str) -> requests.Response:
         return requests.post(
             url=f'{Config.url}/users',
+            headers=auth_headers(token),
             json=user.dict(),
         )
     
@@ -51,4 +54,16 @@ class UserAPI:
 
         return response.json()['msg']
 
+    def update_password_raw(self, user: User, token: str, new_password: str) -> requests.Response:
+        return requests.put(
+            url=f'{Config.url}/users/{user.id}/password',
+            headers=auth_headers(token),
+            json={'password': new_password})
+
+    def update_password(self, user: User, token: str, new_password: str):
+        response = self.update_password_raw(user=user, token=token, new_password=new_password)
+
+        if response.status_code != 200:
+            pytest.fail(reason=f'Сервер ответил ошибкой {response.status_code}')
+        return response.json()['msg']
 
