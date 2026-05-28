@@ -7,11 +7,6 @@ from employees import Employee
 
 
 class EmployeeAPI:
-    def create_raw(self, token: str, employee: Employee) -> requests.Response:
-        return requests.post(f'{Config.url}/employees',
-                             headers=auth_headers(token),
-                             json=employee.dict())
-
     def create(self, token: str, employee: Employee) -> Employee:
         response = self.create_raw(token, employee)
 
@@ -22,6 +17,17 @@ class EmployeeAPI:
             pytest.fail(reason="Не пришёл ответ")
 
         return Employee.from_dict(employee_raw)
+
+    def create_raw(self, token: str, custom_data: dict | Employee) -> requests.Response:
+        if isinstance(custom_data, Employee):
+            payload = custom_data.dict()
+        elif isinstance(custom_data, dict):
+            payload = custom_data
+        else:
+            raise TypeError(f"custom_data должен быть Employee или dict, получен {type(custom_data)}")
+        return requests.post(f'{Config.url}/employees',
+                             headers=auth_headers(token),
+                             json=payload)
 
 
     def get_employees_all_raw(self, token: str, limit: int = 1) -> requests.Response:
@@ -56,14 +62,9 @@ class EmployeeAPI:
 
         return Employee.from_dict(employee_raw)
 
-    def update_employee_raw(self, token: str, employeeId: int, employee: Employee) -> requests.Response:
-        return requests.put(f'{Config.url}/employees/{employeeId}',
-                            headers=auth_headers(token),
-                            json= employee.dict()
-                            )
 
-    def update_employee(self,token: str, employeeId: int, employee: Employee) -> Employee:
-        response = self.update_employee_raw(token, employeeId, employee)
+    def update_employee(self,token: str, employeeId: int, new_employee_data: Employee) -> Employee:
+        response = self.update_employee_raw(token, employeeId, new_employee_data)
         if response.status_code != 200:
             pytest.fail(reason=f"Сервeр ответил с ошибкой: {response.status_code}")
 
@@ -71,6 +72,17 @@ class EmployeeAPI:
             pytest.fail(reason="Не пришёл ответ")
 
         return Employee.from_dict(employee_raw)
+
+    def update_employee_raw(self, token: str, employeeId: int, custom_data: dict | Employee) -> requests.Response:
+        if isinstance(custom_data, Employee):
+            payload = custom_data.dict()
+        elif isinstance(custom_data, dict):
+            payload = custom_data
+        else:
+            raise TypeError(f"custom_data должен быть Employee или dict, получен {type(custom_data)}")
+        return requests.put(f'{Config.url}/employees/{employeeId}',
+                            headers=auth_headers(token),
+                            json=payload)
 
     def delete_employee_raw(self, token: str, employeeId: int) -> requests.Response:
         return requests.delete(f'{Config.url}/employees/{employeeId}',

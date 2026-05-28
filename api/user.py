@@ -1,5 +1,3 @@
-from http.client import responses
-
 import pytest
 import requests
 
@@ -26,6 +24,7 @@ class UserAPI:
             headers=auth_headers(token),
             json=user.dict(),
         )
+
     
     def delete(self, token: str, id: int):
         response = self.delete_raw(token=token, id=id)

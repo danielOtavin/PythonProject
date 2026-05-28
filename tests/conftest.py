@@ -39,8 +39,8 @@ def user_token(request: pytest.FixtureRequest, token_api: Token):
 
 @pytest.fixture(scope='function')
 def random_user(user_api: UserAPI, admin_token: str) -> Generator[User]:
-    user_to_create: User = User.random()
-    user_created = user_api.create(user=user_to_create)
+    user_to_create: User = User.random_user()
+    user_created = user_api.create(user=user_to_create, token=admin_token)
 
     yield user_created
     
