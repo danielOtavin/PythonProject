@@ -76,4 +76,41 @@ def user_with_role(user_api: UserAPI, admin_token: str, request) -> Generator[Us
     user_api.delete_raw(token=admin_token, id=user_created.id)
 
 
+@pytest.fixture(scope='function')
+def employee_cleanup(employee_api: EmployeeAPI, admin_token: str):
+    to_delete = []
+    def add(employee_id):
+        to_delete.append(employee_id)
+    yield add
+    for employee_id in to_delete:
+        employee_api.delete_employee_raw(token=admin_token, employeeId=employee_id)
+
+@pytest.fixture(scope='function')
+def user_cleanup(user_api: UserAPI, admin_token: str):
+    to_delete = []
+    def add(user_id):
+        to_delete.append(user_id)
+    yield add
+    for user_id in to_delete:
+        user_api.delete_raw(token=admin_token, id=user_id)
+
+@pytest.fixture(scope='function')
+def company_cleanup(company_api: CompanyAPI, admin_token: str):
+    to_delete = []
+    def add(company_id):
+        to_delete.append(company_id)
+    yield add
+    for company_id in to_delete:
+        company_api.delete_company_raw(token=admin_token, companyId=company_id)
+
+
+
+
+
+
+
+
+
+
+
 
