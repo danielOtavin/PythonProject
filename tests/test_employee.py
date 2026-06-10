@@ -26,19 +26,21 @@ class TestEmployee:
         assert response.status_code == expected_status_code
 
 
-    @pytest.mark.parametrize('employee_data, expected_status_code, should_delete', [
-        (lambda emp: Employee('', emp.salary, emp.work), 400, False),
-        (lambda emp: Employee(emp.name, -1, emp.work), 400, False),
-        (lambda emp: Employee(emp.name, 1_000_000_000, emp.work), 201, True),
-        (lambda emp: Employee(emp.name, '1_000_000_000', emp.work), 400, False),
-    ])
-    def test_create_employee_with_employee_data(self, random_employee, employee_api, admin_token, employee_data, expected_status_code, should_delete):
+    @pytest.mark.parametrize('employee_data, expected_status_code', [
+        (lambda emp: Employee(name='', salary=emp.salary, work=emp.work), 400),
+        (lambda emp: Employee(name=emp.name, salary=-1, work=emp.work), 400),
+        (lambda emp: Employee(name=emp.name, salary=1_000_000_000, work=emp.work), 201),
+        (lambda emp: Employee(name=emp.name, salary='1_000_000_000', work=emp.work), 400),
+    ],
+        ids= ['без имени',
+              'отрицательное значение зарплаты',
+              'слишком большое значение зарплаты',
+              'неправильный тип данных'])
+    def test_create_employee_with_employee_data(self, random_employee, employee_api, admin_token, employee_data, expected_status_code, employee_cleanup):
         payload = employee_data(random_employee)
         response = employee_api.create_raw(token=admin_token, custom_data=payload)
         assert response.status_code == expected_status_code
-        if should_delete:
-            employee_api.delete_employee_raw(admin_token, response.json().get('id'))
-
+        employee_cleanup(response.json().get('id'))
 
     def test_create_employee_without_required_field(self, random_employee, employee_api, admin_token):
         employee_data = {'name': random_employee.name, 'work': random_employee.work}
@@ -82,12 +84,12 @@ class TestEmployee:
         ('admin_token', -1, 404),
     ])
     def test_get_employee(self, employee_api, admin_token, user_token, expected_token, expected_employeeID, expected_status_code):
-        if expected_token == 'user_token':
-            token = user_token
-        elif expected_token == 'admin_token':
-            token = admin_token
-        else:
-            token = ''
+        tokens = {'admin_token': admin_token,
+                 'user_token': user_token,
+                 'empty_token': ''}
+
+        token = tokens[expected_token]
+
         response = employee_api.get_employee_raw(token, expected_employeeID)
         assert response.status_code == expected_status_code
 
@@ -99,13 +101,13 @@ class TestEmployee:
     ])
     def test_update_employee(self, admin_token, employee_api, expected_token, expected_employeeId, expected_status_code,
                          user_token):
-        if expected_token == 'admin_token':
-            token = admin_token
-        elif expected_token == 'user_token':
-            token = user_token
-        else:
-            token = ''
-        response = employee_api.update_employee_raw(token, expected_employeeId, Employee('Ivan', 1000, True))
+        tokens = {'admin_token': admin_token,
+                 'user_token': user_token,
+                  'empty_token': ''}
+
+        token = tokens[expected_token]
+
+        response = employee_api.update_employee_raw(token, expected_employeeId, Employee(name='Ivan', salary=1000, work=True))
         assert response.status_code == expected_status_code
 
 
@@ -117,14 +119,15 @@ class TestEmployee:
 
 
     @pytest.mark.parametrize('employee_data, expected_status_code', [
-        (Employee('', 1000, True), 404),
-        (Employee('Ivan', -1000, True), 404),
-        (Employee('Ivan', '1000', True), 404),
+        (Employee(name='', salary=1000, work=True), 404),
+        (Employee(name='Ivan', salary=-1000, work=True), 404),
+        (Employee(name='Ivan', salary='1000', work=True), 404),
         ({'name': 'Ivan', 'salary': 1000, 'work': True, 'extra_field': ''}, 400)
     ])
     def test_update_user_incorrect_data_or_extra_field(self, employee_api, admin_token, random_employee, employee_data, expected_status_code):
         response = employee_api.update_employee_raw(token=admin_token, employeeId=random_employee.id, custom_data=employee_data)
         assert response.status_code == expected_status_code
+
 
 
     def test_delete_created_user(self, employee_api, random_employee, admin_token):

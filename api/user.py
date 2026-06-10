@@ -16,13 +16,13 @@ class UserAPI:
         if not (user_raw := response.json()):
             pytest.fail(reason="не пришёл ответ")
 
-        return User.from_dict(user_raw)
+        return User.model_validate(user_raw)
 
     def create_raw(self, user: User, token: str) -> requests.Response:
         return requests.post(
             url=f'{Config.url}/users',
             headers=auth_headers(token),
-            json=user.dict(),
+            json=user.model_dump(),
         )
 
     
@@ -53,14 +53,14 @@ class UserAPI:
 
         return response.json()['msg']
 
-    def update_password_raw(self, user: User, token: str, new_password: str) -> requests.Response:
+    def update_password_raw(self, userId: int, token: str, new_password: str) -> requests.Response:
         return requests.put(
-            url=f'{Config.url}/users/{user.id}/password',
+            url=f'{Config.url}/users/{userId}/password',
             headers=auth_headers(token),
             json={'password': new_password})
 
-    def update_password(self, user: User, token: str, new_password: str):
-        response = self.update_password_raw(user=user, token=token, new_password=new_password)
+    def update_password(self, userId: int, token: str, new_password: str):
+        response = self.update_password_raw(userId = userId, token=token, new_password=new_password)
 
         if response.status_code != 200:
             pytest.fail(reason=f'Сервер ответил ошибкой {response.status_code}')

@@ -1,34 +1,16 @@
 import faker
+from pydantic import BaseModel
 
-
-class User:
-    id: int
+class User(BaseModel):
+    id: int = -1
     login: str
     password: str
-    
-    @staticmethod
-    def from_dict(raw: dict):
-        return User(
-            id=raw['id'],
-            login= raw['login'],
-            password=raw['password'],
-        )
-    
+
     @staticmethod
     def random_user():
         fake = faker.Faker('ru_RU')
         return User(login=fake.email(), password=fake.password(length=12))
 
-    def __init__(self,login: str, password: str, id: int = -1):
-        self.id = id
-        self.login = login
-        self.password = password
-
-    def dict(self) -> dict[str, str]:
-        return {
-            "login": self.login,
-            "password": self.password,
-        }
 
 
 

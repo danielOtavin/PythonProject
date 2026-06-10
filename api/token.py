@@ -20,5 +20,5 @@ class Token:
     def get_token_raw(self, user: User) -> requests.Response:
         return requests.post(
              url=f"{Config.url}/token",
-             json=user.dict(),
+             json=user.model_dump(),
         )

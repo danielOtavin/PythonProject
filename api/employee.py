@@ -16,11 +16,11 @@ class EmployeeAPI:
         if not (employee_raw := response.json()):
             pytest.fail(reason="Не пришёл ответ")
 
-        return Employee.from_dict(employee_raw)
+        return Employee.model_validate(employee_raw)
 
     def create_raw(self, token: str, custom_data: dict | Employee) -> requests.Response:
         if isinstance(custom_data, Employee):
-            payload = custom_data.dict()
+            payload = custom_data.model_dump()
         elif isinstance(custom_data, dict):
             payload = custom_data
         else:
@@ -45,7 +45,7 @@ class EmployeeAPI:
         if not employees_data:
             pytest.fail(reason="не пришёл ответ")
 
-        return [Employee.from_dict(emp) for emp in employees_data]
+        return [Employee.model_validate(emp) for emp in employees_data]
 
 
     def get_employee_raw(self, token: str, employeeId: int = 1) -> requests.Response:
@@ -60,7 +60,7 @@ class EmployeeAPI:
         if not (employee_raw := response.json()):
             pytest.fail(reason="Не пришёл ответ")
 
-        return Employee.from_dict(employee_raw)
+        return Employee.model_validate(employee_raw)
 
 
     def update_employee(self,token: str, employeeId: int, new_employee_data: Employee) -> Employee:
@@ -71,11 +71,11 @@ class EmployeeAPI:
         if not (employee_raw := response.json()):
             pytest.fail(reason="Не пришёл ответ")
 
-        return Employee.from_dict(employee_raw)
+        return Employee.model_validate(employee_raw)
 
     def update_employee_raw(self, token: str, employeeId: int, custom_data: dict | Employee) -> requests.Response:
         if isinstance(custom_data, Employee):
-            payload = custom_data.dict()
+            payload = custom_data.model_dump()
         elif isinstance(custom_data, dict):
             payload = custom_data
         else:

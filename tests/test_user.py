@@ -28,11 +28,11 @@ class TestUserPositive:
 
 
     @pytest.mark.parametrize("user_data, expected_status_code", [
-        (lambda u: User('', u.password), 400),
-        (lambda u: User(u.login, ''), 400),
-        (lambda u: User(u.login, u.login), 400),
-        (lambda u: User(u.login, '1234567890'), 400),
-        (lambda u: User(u.login, 'passwordwithoutdigits'), 400),
+        (lambda u: User(login='', password=u.password), 400),
+        (lambda u: User(login=u.login, password=''), 400),
+        (lambda u: User(login=u.login, password=u.login), 400),
+        (lambda u: User(login=u.login, password='1234567890'), 400),
+        (lambda u: User(login=u.login, password='passwordwithoutdigits'), 400),
     ])
     def test_create_user_data(self, admin_token, user_api, random_user, user_data, expected_status_code):
         payload = user_data(random_user)
@@ -98,7 +98,7 @@ class TestUserPositive:
         user_token = token_api.get_token(created_user)
 
         new_password = "new_password_123"
-        response = user_api.update_password_raw(created_user, user_token, new_password)
+        response = user_api.update_password_raw(created_user.id, user_token, new_password)
         assert response.status_code == 200
 
         updated_user = User(login=created_user.login, password=new_password)
