@@ -80,9 +80,15 @@ class TestEmployee:
         ('admin_token', 999999, 404),
         ('empty_token', 1, 401),
         ('user_token', 1, 200),
-        ('admin_token', '1', 404),
+        ('admin_token', 'один', 404),
         ('admin_token', -1, 404),
-    ])
+    ],
+        ids = ['Несуществующий id',
+               'Пустой токен',
+               'Токен пользователя',
+               'Неправильный тип данных в поле id',
+               'Отрицательный номер id'])
+
     def test_get_employee(self, employee_api, admin_token, user_token, expected_token, expected_employeeID, expected_status_code):
         tokens = {'admin_token': admin_token,
                  'user_token': user_token,
@@ -98,7 +104,12 @@ class TestEmployee:
         ('admin_token', 999999, 404),
         ('empty_token', 1, 401),
         ('user_token', 1, 403)
-    ])
+    ],
+        ids = ['Несуществующий id',
+               'Пустой токен',
+               'Токен пользователя'
+               ])
+
     def test_update_employee(self, admin_token, employee_api, expected_token, expected_employeeId, expected_status_code,
                          user_token):
         tokens = {'admin_token': admin_token,
@@ -121,8 +132,11 @@ class TestEmployee:
     @pytest.mark.parametrize('employee_data, expected_status_code', [
         (Employee(name='', salary=1000, work=True), 404),
         (Employee(name='Ivan', salary=-1000, work=True), 404),
-        (Employee(name='Ivan', salary='1000', work=True), 404),
+        (Employee(name='Ivan', salary='тысяча', work=True), 404),
         ({'name': 'Ivan', 'salary': 1000, 'work': True, 'extra_field': ''}, 400)
+    ], ids= ['Пустое поле имени',
+             'Отрицательное значение зарплаты',
+             'Неправильный тип данных'
     ])
     def test_update_user_incorrect_data_or_extra_field(self, employee_api, admin_token, random_employee, employee_data, expected_status_code):
         response = employee_api.update_employee_raw(token=admin_token, employeeId=random_employee.id, custom_data=employee_data)

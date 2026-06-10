@@ -48,6 +48,12 @@ class TestCompany:
         (lambda cmp: Company(name=cmp.name, year=20000000, country=cmp.country)),
         (lambda cmp: {}),
         (lambda cmp: Company(name=cmp.name, year=cmp.year, country=cmp.country, work = True)),
+    ], ids = ['Пустое имя компании',
+              'Отрицательное значение года',
+              'Неправильный тип данных',
+              'Слишком большой год',
+              'Пустые данные',
+              'Лишнее поле'
     ])
     def test_create_company_negative(self, company_api, admin_token, random_company, company_data):
         payload = company_data(random_company)
@@ -60,19 +66,28 @@ class TestCompany:
         (0, 404),
         (-1, 404),
         ('один', 404)
+    ], ids = ['Несуществующий id',
+              'id равен нулю',
+              'Отрицательный id',
+              'Неправильный тип данных'
     ])
     def test_get_company_negative(self, company_api, admin_token, random_company, comp_id, expected_status_code):
         response = company_api.get_company_raw(admin_token, comp_id)
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize('data, expected_status_code', [
-        (lambda cmp: Company(name=cmp.name, year=cmp.year, country=cmp.country), 400),
         (lambda cmp: Company(name=cmp.name, year=-cmp.year, country=cmp.country), 400),
         (lambda cmp: Company(name=cmp.name, year=20000000, country=cmp.country), 400),
         (lambda cmp: Company(name=cmp.name, year=0, country=cmp.country), 400),
         (lambda cmp: Company(name=cmp.name, year='сто', country=cmp.country), 400),
-        (lambda cmp: Company(name=cmp.name, year=cmp.year, country=cmp.country, work = True), 400),
+        (lambda cmp: Company(name=cmp.name, year=cmp.year, country=cmp.country, work=True), 400),
         (lambda cmp: {}, 400)
+    ], ids=['Отрицательное значение года',
+            'Слишком большой год',
+            'Год равен нулю',
+            'Неправильный тип данных',
+            'Лишнее поле',
+            'Пустые данные'
     ])
     def test_update_company_negative(self, company_api, admin_token, random_company, data, expected_status_code):
         payload = data(random_company)

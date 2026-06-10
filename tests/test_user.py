@@ -33,7 +33,12 @@ class TestUserPositive:
         (lambda u: User(login=u.login, password=u.login), 400),
         (lambda u: User(login=u.login, password='1234567890'), 400),
         (lambda u: User(login=u.login, password='passwordwithoutdigits'), 400),
-    ])
+    ], ids= ['Пустой логин',
+             'Пустой пароль',
+             'Пароль и логин одинаковые',
+             'Пароль содержит только цифры',
+             'Пароль содержит только буквы'
+             ])
     def test_create_user_data(self, admin_token, user_api, random_user, user_data, expected_status_code):
         payload = user_data(random_user)
         response = user_api.create_raw(payload, admin_token)

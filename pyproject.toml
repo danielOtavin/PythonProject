@@ -1,0 +1,19 @@
+[project]
+name = "test-api-for-qa"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "DanielOtavin",email = "you@example.com"}
+]
+requires-python = ">=3.13"
+dependencies = [
+    "requests (>=2.34.2,<3.0.0)",
+    "pytest (>=9.0.3,<10.0.0)",
+    "faker (>=40.22.0,<41.0.0)",
+    "pydantic (>=2.13.4,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
