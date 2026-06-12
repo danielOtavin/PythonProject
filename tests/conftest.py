@@ -10,7 +10,7 @@ from employees import Employee
 from users import ADMIN, TEST, User
 
 @pytest.fixture(scope="session")
-def token_api() -> Generator[Token]:
+def token_api():
     yield Token()
 
 @pytest.fixture(scope="session")
