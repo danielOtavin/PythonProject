@@ -14,20 +14,20 @@ def token_api():
     yield Token()
 
 @pytest.fixture(scope="session")
-def user_api() -> Generator[UserAPI]:
+def user_api():
     yield UserAPI()
 
 @pytest.fixture(scope="session")
-def employee_api() -> Generator[EmployeeAPI]:
+def employee_api():
     yield EmployeeAPI()
 
 @pytest.fixture(scope="session")
-def company_api() -> Generator[CompanyAPI]:
+def company_api():
     yield CompanyAPI()
 
 
 @pytest.fixture(scope='session')
-def admin_token(token_api: Token) -> Generator[str]:
+def admin_token(token_api: Token):
     yield token_api.get_token(user=ADMIN)
 
 
@@ -37,7 +37,7 @@ def user_token(request: pytest.FixtureRequest, token_api: Token):
     return token_api.get_token(user=user)
 
 @pytest.fixture(scope='function')
-def random_user(user_api: UserAPI, admin_token: str) -> Generator[User]:
+def random_user(user_api: UserAPI, admin_token: str):
     user_to_create: User = User.random_user()
     user_created = user_api.create(user=user_to_create, token=admin_token)
 
@@ -46,7 +46,7 @@ def random_user(user_api: UserAPI, admin_token: str) -> Generator[User]:
     user_api.delete_raw(token=admin_token, id=user_created.id)
 
 @pytest.fixture(scope='function')
-def random_employee(employee_api: EmployeeAPI, admin_token: str) -> Generator[Employee]:
+def random_employee(employee_api: EmployeeAPI, admin_token: str):
     employee_to_create: Employee = Employee.random_employee()
     employee_created = employee_api.create(token=admin_token, employee=employee_to_create)
 
@@ -55,7 +55,7 @@ def random_employee(employee_api: EmployeeAPI, admin_token: str) -> Generator[Em
     employee_api.delete_employee_raw(token=admin_token, employeeId=employee_created.id)
 
 @pytest.fixture(scope='function')
-def random_company(company_api: CompanyAPI, admin_token: str) -> Generator[Company]:
+def random_company(company_api: CompanyAPI, admin_token: str):
     company_to_create: Company = Company.random_company()
     company_created = company_api.create(token=admin_token, company=company_to_create)
 
@@ -64,7 +64,7 @@ def random_company(company_api: CompanyAPI, admin_token: str) -> Generator[Compa
     company_api.delete_company_raw(token=admin_token, companyId=company_created.id)
 
 @pytest.fixture(params=['read', 'write', 'admin'])
-def user_with_role(user_api: UserAPI, admin_token: str,  request) -> Generator[User]:
+def user_with_role(user_api: UserAPI, admin_token: str,  request):
     role = request.param
     user_to_create: User = User.random_user()
     user_created = user_api.create(user=user_to_create, token=admin_token)
