@@ -7,10 +7,16 @@ from config import Config
 
 
 class CompanyAPI:
-    def create_raw(self, token: str, company: Company) -> requests.Response:
+    def create_raw(self, token: str, company: Company | dict) -> requests.Response:
+        if isinstance(company, Company):
+            payload = company.model_dump()
+        elif isinstance(company, dict):
+            payload = company
+        else:
+            raise TypeError(f"company должен быть Employee или dict, получен {type(company)}")
         return requests.post(f'{Config.url}/companies',
                              headers=auth_headers(token),
-                             json=company.model_dump())
+                             json=payload)
 
 
     def create(self, token: str, company: Company) -> Company:
@@ -64,9 +70,15 @@ class CompanyAPI:
 
 
     def update_company_raw(self, token: str, companyId: int, company: Company) -> requests.Response:
+        if isinstance(company, Company):
+            payload = company.model_dump()
+        elif isinstance(company, dict):
+            payload = company
+        else:
+            raise TypeError(f"company должен быть Employee или dict, получен {type(company)}")
         return requests.put(f'{Config.url}/companies/{companyId}',
                             headers=auth_headers(token),
-                            json=company.model_dump())
+                            json=payload)
 
     def update_company(self, token: str, companyId: int, company: Company) -> Company:
         response = self.update_company_raw(token, companyId, company)

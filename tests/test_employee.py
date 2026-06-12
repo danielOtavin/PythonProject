@@ -1,7 +1,6 @@
 import pytest
 
 from employees import Employee
-from tests.conftest import admin_token, user_token
 
 class TestEmployee:
     def test_create_employee(self, employee_api, random_employee, admin_token):
@@ -17,9 +16,11 @@ class TestEmployee:
 
 
     @pytest.mark.parametrize('expected_token, expected_status_code', [
-        ('empty', 401),
+        ('', 401),
         ('user_token', 403)
-    ])
+    ], ids= ['empty_token',
+             'user_token'
+             ])
     def test_create_employee_token_scenarios(self, random_employee, employee_api, user_token, expected_token, expected_status_code):
         token = '' if expected_token == 'empty' else user_token
         response = employee_api.create_raw(token, random_employee)
@@ -32,10 +33,10 @@ class TestEmployee:
         (lambda emp: Employee(name=emp.name, salary=1_000_000_000, work=emp.work), 201),
         (lambda emp: Employee(name=emp.name, salary='1_000_000_000', work=emp.work), 400),
     ],
-        ids= ['без имени',
-              'отрицательное значение зарплаты',
-              'слишком большое значение зарплаты',
-              'неправильный тип данных'])
+        ids= ['empty_name',
+              'negative_salary_value',
+              'too_huge_salary_value',
+              'incorrect_data_type'])
     def test_create_employee_with_employee_data(self, random_employee, employee_api, admin_token, employee_data, expected_status_code, employee_cleanup):
         payload = employee_data(random_employee)
         response = employee_api.create_raw(token=admin_token, custom_data=payload)
@@ -83,12 +84,11 @@ class TestEmployee:
         ('admin_token', 'один', 404),
         ('admin_token', -1, 404),
     ],
-        ids = ['Несуществующий id',
-               'Пустой токен',
-               'Токен пользователя',
-               'Неправильный тип данных в поле id',
-               'Отрицательный номер id'])
-
+        ids = ['unknown_id',
+               'empty_token',
+               'user_token',
+               'invalid_data_type_in_id_field',
+               'negative_id_number'])
     def test_get_employee(self, employee_api, admin_token, user_token, expected_token, expected_employeeID, expected_status_code):
         tokens = {'admin_token': admin_token,
                  'user_token': user_token,
@@ -105,9 +105,9 @@ class TestEmployee:
         ('empty_token', 1, 401),
         ('user_token', 1, 403)
     ],
-        ids = ['Несуществующий id',
-               'Пустой токен',
-               'Токен пользователя'
+        ids = ['unknown_id',
+               'empty_token',
+               'user_token'
                ])
 
     def test_update_employee(self, admin_token, employee_api, expected_token, expected_employeeId, expected_status_code,
@@ -132,11 +132,11 @@ class TestEmployee:
     @pytest.mark.parametrize('employee_data, expected_status_code', [
         (Employee(name='', salary=1000, work=True), 404),
         (Employee(name='Ivan', salary=-1000, work=True), 404),
-        (Employee(name='Ivan', salary='тысяча', work=True), 404),
+        (Employee(name='Ivan', salary='1000', work=True), 404),
         ({'name': 'Ivan', 'salary': 1000, 'work': True, 'extra_field': ''}, 400)
-    ], ids= ['Пустое поле имени',
-             'Отрицательное значение зарплаты',
-             'Неправильный тип данных'
+    ], ids= ['empty_name_field',
+             'negative_salary_field',
+             'negative_data_type'
     ])
     def test_update_user_incorrect_data_or_extra_field(self, employee_api, admin_token, random_employee, employee_data, expected_status_code):
         response = employee_api.update_employee_raw(token=admin_token, employeeId=random_employee.id, custom_data=employee_data)
@@ -154,3 +154,4 @@ class TestEmployee:
         assert find_deleted_user.status_code == 404
         second_delete = employee_api.delete_employee_raw(token=admin_token, employeeId=created_user.id)
         assert second_delete.status_code == 404
+

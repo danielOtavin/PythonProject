@@ -101,15 +101,3 @@ def company_cleanup(company_api: CompanyAPI, admin_token: str):
     yield add
     for company_id in to_delete:
         company_api.delete_company_raw(token=admin_token, companyId=company_id)
-
-
-
-
-
-
-
-
-
-
-
-

@@ -21,7 +21,10 @@ class TestUserPositive:
         ('admin_token', 201, True),
         ('empty_token', 403, False),
         ('user_token', 403, False)
-    ])
+    ], ids=['admin_token',
+            'empty_token',
+            'user_token'
+            ])
     def test_create_user_token(self, admin_token, user_token, random_user, user_api, expected_token, expected_status_code, should_delete):
         response = user_api.create_raw(random_user, expected_token)
         assert response == expected_status_code
@@ -33,11 +36,11 @@ class TestUserPositive:
         (lambda u: User(login=u.login, password=u.login), 400),
         (lambda u: User(login=u.login, password='1234567890'), 400),
         (lambda u: User(login=u.login, password='passwordwithoutdigits'), 400),
-    ], ids= ['Пустой логин',
-             'Пустой пароль',
-             'Пароль и логин одинаковые',
-             'Пароль содержит только цифры',
-             'Пароль содержит только буквы'
+    ], ids= ['empty_login',
+             'empty_password',
+             'equal_login_and_password',
+             'password_without_letters',
+             'password_without_numbers'
              ])
     def test_create_user_data(self, admin_token, user_api, random_user, user_data, expected_status_code):
         payload = user_data(random_user)
