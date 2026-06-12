@@ -69,7 +69,7 @@ class CompanyAPI:
         return Company.model_validate(company_raw)
 
 
-    def update_company_raw(self, token: str, companyId: int, company: Company) -> requests.Response:
+    def update_company_raw(self, token: str, companyId: int, company: Company | dict) -> requests.Response:
         if isinstance(company, Company):
             payload = company.model_dump()
         elif isinstance(company, dict):

@@ -136,7 +136,8 @@ class TestEmployee:
         ({'name': 'Ivan', 'salary': 1000, 'work': True, 'extra_field': ''}, 400)
     ], ids= ['empty_name_field',
              'negative_salary_field',
-             'negative_data_type'
+             'negative_data_type',
+             'extra_field'
     ])
     def test_update_user_incorrect_data_or_extra_field(self, employee_api, admin_token, random_employee, employee_data, expected_status_code):
         response = employee_api.update_employee_raw(token=admin_token, employeeId=random_employee.id, custom_data=employee_data)
