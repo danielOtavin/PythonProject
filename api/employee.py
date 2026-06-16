@@ -7,8 +7,8 @@ from employees import Employee
 
 
 class EmployeeAPI:
-    def create(self, token: str, employee: Employee) -> Employee:
-        response = self.create_raw(token, employee)
+    def create_employee(self, token: str, employee: Employee) -> Employee:
+        response = self.create_employee_raw(token, employee)
 
         if response.status_code != 201:
             pytest.fail(reason=f"Сервeр ответил с ошибкой: {response.status_code}")
@@ -18,7 +18,7 @@ class EmployeeAPI:
 
         return Employee.model_validate(employee_raw)
 
-    def create_raw(self, token: str, custom_data: dict | Employee) -> requests.Response:
+    def create_employee_raw(self, token: str, custom_data: dict | Employee) -> requests.Response:
         if isinstance(custom_data, Employee):
             payload = custom_data.model_dump()
         elif isinstance(custom_data, dict):

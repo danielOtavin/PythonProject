@@ -1,10 +1,10 @@
 import faker
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt, StrictStr
 
 class User(BaseModel):
-    id: int = -1
-    login: str
-    password: str
+    id: StrictInt = -1
+    login: StrictStr
+    password: StrictStr
 
     @staticmethod
     def random_user():

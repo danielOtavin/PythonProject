@@ -7,7 +7,7 @@ from config import Config
 
 
 class CompanyAPI:
-    def create_raw(self, token: str, company: Company | dict) -> requests.Response:
+    def create_company_raw(self, token: str, company: Company | dict) -> requests.Response:
         if isinstance(company, Company):
             payload = company.model_dump()
         elif isinstance(company, dict):
@@ -19,8 +19,8 @@ class CompanyAPI:
                              json=payload)
 
 
-    def create(self, token: str, company: Company) -> Company:
-        response = self.create_raw(token, company)
+    def create_company(self, token: str, company: Company) -> Company:
+        response = self.create_company_raw(token, company)
 
         if response.status_code != 201:
             pytest.fail(reason=f"Сервeр ответил с ошибкой: {response.status_code}")

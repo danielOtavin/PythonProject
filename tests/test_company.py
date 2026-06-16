@@ -3,9 +3,30 @@ from companies import Company
 
 
 class TestCompany:
-    def test_create_company(self, company_api, admin_token, random_company):
-        response = company_api.create_raw(admin_token, random_company)
-        assert response.status_code == 201
+    def test_create_and_get_company(self, company_api, admin_token, random_company):
+        response_create = company_api.create_company_raw(admin_token, random_company)
+        data_create = response_create.json()
+        company_id = data_create.get('id')
+        assert response_create.status_code == 201
+        assert data_create.pop('id') > 0
+        assert data_create == {
+            'name': random_company.name,
+            'year': random_company.year,
+            'country': random_company.country
+        }
+        response_get = company_api.get_company_raw(admin_token, company_id)
+        data_get = response_get.json()
+        assert response_get.status_code == 200
+        assert data_get.pop('id') > 0
+        assert data_get == {
+            'name': random_company.name,
+            'year': random_company.year,
+            'country': random_company.country
+        }
+
+
+
+
 
     def test_get_company_by_id(self, company_api, admin_token, random_company):
         response = company_api.get_company_raw(admin_token, random_company.id)
@@ -57,7 +78,7 @@ class TestCompany:
     ])
     def test_create_company_negative(self, company_api, admin_token, random_company, company_data):
         payload = company_data(random_company)
-        response = company_api.create_raw(admin_token, payload)
+        response = company_api.create_company_raw(admin_token, payload)
         assert response.status_code == 400
 
 

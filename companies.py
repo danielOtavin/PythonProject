@@ -1,12 +1,13 @@
 import random
 import faker
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt, StrictStr
+
 
 class Company(BaseModel):
-    id: int = -1
-    name: str
-    year: int
-    country: str
+    id: StrictInt = -1
+    name: StrictStr
+    year: StrictInt
+    country: StrictStr
 
     @staticmethod
     def random_company():

@@ -1,11 +1,12 @@
 import random
 import faker
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt, StrictStr
+
 
 class Employee(BaseModel):
-    id: int = -1
-    name: str
-    salary: int
+    id: StrictInt = -1
+    name: StrictStr
+    salary: StrictInt
     work: bool
 
     @staticmethod
