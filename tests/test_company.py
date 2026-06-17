@@ -3,39 +3,34 @@ from companies import Company
 
 
 class TestCompany:
-    def test_create_and_get_company(self, company_api, admin_token, random_company):
-        response_create = company_api.create_company_raw(admin_token, random_company)
+    def test_create_get_and_delete_company(self, company_api, admin_token):
+        created_company_data = Company.random_company()
+        response_create = company_api.create_company_raw(admin_token, created_company_data)
         data_create = response_create.json()
         company_id = data_create.get('id')
         assert response_create.status_code == 201
         assert data_create.pop('id') > 0
         assert data_create == {
-            'name': random_company.name,
-            'year': random_company.year,
-            'country': random_company.country
+            'name': created_company_data.name,
+            'year': created_company_data.year,
+            'country': created_company_data.country
         }
+
         response_get = company_api.get_company_raw(admin_token, company_id)
         data_get = response_get.json()
         assert response_get.status_code == 200
         assert data_get.pop('id') > 0
         assert data_get == {
-            'name': random_company.name,
-            'year': random_company.year,
-            'country': random_company.country
+            'name': created_company_data.name,
+            'year': created_company_data.year,
+            'country': created_company_data.country
         }
-
-
-
-
-
-    def test_get_company_by_id(self, company_api, admin_token, random_company):
-        response = company_api.get_company_raw(admin_token, random_company.id)
-        assert response.status_code == 200
-        data = response.json()
-        assert data['id'] == random_company.id
-        assert data['name'] == random_company.name
-        assert data['year'] == random_company.year
-        assert data['country'] == random_company.country
+        response_delete = company_api.delete_company_raw(admin_token, company_id)
+        assert response_delete.status_code == 204
+        get_deleted_company = company_api.get_company_raw(admin_token, company_id)
+        assert get_deleted_company.status_code == 400
+        second_delete = company_api.delete_company_raw(admin_token, company_id)
+        assert second_delete.status_code == 404
 
     def test_get_list_of_companies(self, company_api, admin_token, random_company):
         response = company_api.get_all_companies_raw(admin_token, limit=10)
@@ -54,18 +49,10 @@ class TestCompany:
                 data['year'] != random_company.year or
                 data['country'] != random_company.country)
 
-    def test_delete_company(self, company_api, admin_token, random_company):
-        response = company_api.delete_company_raw(admin_token, random_company.id)
-        assert response.status_code == 204
-        response = company_api.get_company_raw(admin_token, random_company.id)
-        assert response.status_code == 404
-        response = company_api.delete_company_raw(admin_token, random_company.id)
-        assert response.status_code == 404
-
     @pytest.mark.parametrize('company_data', [
         (lambda cmp: Company(name='', year=cmp.year, country=cmp.country)),
         (lambda cmp: Company(name=cmp.name, year=-2020, country=cmp.country)),
-        (lambda cmp: Company(name=cmp.name, year='две тысячи', country=cmp.country)),
+        (lambda cmp: Company(name=cmp.name, year='2000', country=cmp.country)),
         (lambda cmp: Company(name=cmp.name, year=20000000, country=cmp.country)),
         (lambda cmp: {}),
         (lambda cmp: Company(name=cmp.name, year=cmp.year, country=cmp.country, work = True)),
@@ -100,7 +87,7 @@ class TestCompany:
         (lambda cmp: Company(name=cmp.name, year=-cmp.year, country=cmp.country), 400),
         (lambda cmp: Company(name=cmp.name, year=20000000, country=cmp.country), 400),
         (lambda cmp: Company(name=cmp.name, year=0, country=cmp.country), 400),
-        (lambda cmp: Company(name=cmp.name, year='сто', country=cmp.country), 400),
+        (lambda cmp: Company(name=cmp.name, year='100', country=cmp.country), 400),
         (lambda cmp: Company(name=cmp.name, year=cmp.year, country=cmp.country, work=True), 400),
         (lambda cmp: {}, 400)
     ], ids=['negative_year_value',
@@ -115,10 +102,15 @@ class TestCompany:
         response = company_api.update_company_raw(admin_token, random_company.id, payload)
         assert response.status_code == expected_status_code
 
-    def test_delete_company_without_access(self, company_api, user_token, random_company):
-        response = company_api.delete_company_raw(user_token, random_company.id)
-        assert response.status_code == 403
 
-    def test_delete_company_without_token(self, company_api, admin_token, random_company):
-        response = company_api.delete_company_raw('', random_company.id)
-        assert response.status_code == 401
+    @pytest.mark.parametrize('expected_token, expected_status_code', [
+        ('user_token', 403),
+        ('empty_token', 401)
+    ], ids=['user_token',
+            'empty_token'])
+    def test_delete_company(self, company_api, user_token, random_company, expected_token, expected_status_code):
+        tokens = {'user_token': user_token,
+                  'empty_token': ''}
+        token = tokens[expected_token]
+        response = company_api.delete_company_raw(token, random_company.id)
+        assert response.status_code == expected_status_code

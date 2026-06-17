@@ -1,18 +1,20 @@
 import pytest
 
+import employees
 from employees import Employee
 
 class TestEmployee:
-    def test_create_and_get_employee(self, employee_api, random_employee, admin_token):
-        response_create = employee_api.create_employee_raw(admin_token, random_employee)
-        data_create = random_employee.json()
+    def test_create_get_and_delete_employee(self, employee_api, admin_token):
+        new_employee_data = Employee.random_employee()
+        response_create = employee_api.create_employee_raw(admin_token, new_employee_data)
+        data_create = response_create.json()
         emp_id = data_create.get('id')
         assert response_create.status_code == 201
         assert data_create.pop('id') > 0
         assert data_create == {
-            'name': random_employee.name,
-            'salary': random_employee.salary,
-            'work': random_employee.work
+            'name': new_employee_data.name,
+            'salary': new_employee_data.salary,
+            'work': new_employee_data.work
         }
 
         response_get = employee_api.get_employee_raw(token=admin_token, employeeId=emp_id)
@@ -20,9 +22,17 @@ class TestEmployee:
         assert response_get.status_code == 200
         assert data_get.pop('id') == emp_id
         assert data_get == {
-            'name': random_employee.name,
-            'salary': random_employee.salary,
-            'work': random_employee.work}
+            'name': new_employee_data.name,
+            'salary': new_employee_data.salary,
+            'work': new_employee_data.work
+        }
+
+        response_delete = employee_api.delete_employee_raw(admin_token, emp_id)
+        assert response_delete.status_code == 204
+        get_deleted_user = employee_api.get_employee_raw(admin_token, emp_id)
+        assert get_deleted_user.status_code == 404
+        second_delete = employee_api.delete_employee_raw(token=admin_token, employeeId=emp_id)
+        assert second_delete.status_code == 404
 
 
     @pytest.mark.parametrize('expected_token, expected_status_code', [
@@ -142,16 +152,4 @@ class TestEmployee:
         response = employee_api.update_employee_raw(token=admin_token, employeeId=random_employee.id, custom_data=employee_data)
         assert response.status_code == expected_status_code
 
-
-
-    def test_delete_created_user(self, employee_api, random_employee, admin_token):
-        created_user = employee_api.create_employee(token=admin_token, employee=random_employee)
-        get_before = employee_api.get_employee_raw(token=admin_token, employeeId=created_user.id)
-        assert get_before.status_code == 200
-        response = employee_api.delete_employee_raw(token=admin_token, employeeId=created_user.id)
-        assert response.status_code == 204
-        find_deleted_user = employee_api.get_employee_raw(token=admin_token, employeeId=created_user.id)
-        assert find_deleted_user.status_code == 404
-        second_delete = employee_api.delete_employee_raw(token=admin_token, employeeId=created_user.id)
-        assert second_delete.status_code == 404
 

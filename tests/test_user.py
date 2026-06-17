@@ -8,25 +8,28 @@ from users import User, ERROR
 
 class TestUserPositive:
     def test_create_user(self, admin_token, user_api):
-        new_user = User.random_user()
-        response = user_api.create_raw(new_user, admin_token)
-        data = response.json()
-        assert response.status_code == 201
-        assert data['login'] == new_user.login
-        assert data['id'] > 0
-
+        created_user_data = User.random_user()
+        response_create = user_api.create_raw(created_user_data, admin_token)
+        data = response_create.json()
+        assert response_create.status_code == 201
+        assert data.get('id') > 0
+        assert data.get('login') == created_user_data.login
 
 
     @pytest.mark.parametrize("expected_token, expected_status_code, should_delete", [
-        ('admin_token', 201, True),
         ('empty_token', 403, False),
         ('user_token', 403, False)
-    ], ids=['admin_token',
-            'empty_token',
-            'user_token'
-            ])
-    def test_create_user_token(self, admin_token, user_token, random_user, user_api, expected_token, expected_status_code, should_delete):
-        response = user_api.create_raw(random_user, expected_token)
+    ], ids=[
+        'empty_token',
+        'user_token'
+        ])
+    def test_create_user_token(self, user_token, random_user, user_api, expected_token, expected_status_code, should_delete):
+        tokens = {
+            'empty_token': '',
+            'user_token': user_token
+            }
+        token = tokens[expected_token]
+        response = user_api.create_raw(random_user, token)
         assert response == expected_status_code
 
 

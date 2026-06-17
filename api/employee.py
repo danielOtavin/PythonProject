@@ -48,7 +48,7 @@ class EmployeeAPI:
         return [Employee.model_validate(emp) for emp in employees_data]
 
 
-    def get_employee_raw(self, token: str, employeeId: int = 1) -> requests.Response:
+    def get_employee_raw(self, token: str, employeeId: int = -1) -> requests.Response:
         return requests.get(f'{Config.url}/employees/{employeeId}',
                             headers=auth_headers(token))
 
