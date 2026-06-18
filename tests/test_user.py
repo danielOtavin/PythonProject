@@ -15,6 +15,9 @@ class TestUserPositive:
         assert data.get('id') > 0
         assert data.get('login') == created_user_data.login
 
+        response_delete = user_api.delete_raw(admin_token, created_user_data.id)
+        assert response_delete.status_code == 204
+
 
     @pytest.mark.parametrize("expected_token, expected_status_code, should_delete", [
         ('empty_token', 403, False),
@@ -74,7 +77,6 @@ class TestUserPositive:
         user_data = User(login=random_user.login, password=fake.password(length=5))
         response = user_api.create_raw(user_data, admin_token)
         assert response.status_code == 400
-
 
 
     def test_update_user_role(self, admin_token, user_api, random_user):

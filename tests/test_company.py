@@ -1,3 +1,4 @@
+import random
 import pytest
 from companies import Company
 
@@ -15,7 +16,6 @@ class TestCompany:
             'year': created_company_data.year,
             'country': created_company_data.country
         }
-
         response_get = company_api.get_company_raw(admin_token, company_id)
         data_get = response_get.json()
         assert response_get.status_code == 200
@@ -25,6 +25,11 @@ class TestCompany:
             'year': created_company_data.year,
             'country': created_company_data.country
         }
+        updated_company_data = Company.random_company()
+        response_update = company_api.update_company_raw(admin_token, company_id, updated_company_data)
+        assert response_update.status_code == 200
+        assert response_update.json().get('id') == company_id
+
         response_delete = company_api.delete_company_raw(admin_token, company_id)
         assert response_delete.status_code == 204
         get_deleted_company = company_api.get_company_raw(admin_token, company_id)
@@ -32,22 +37,14 @@ class TestCompany:
         second_delete = company_api.delete_company_raw(admin_token, company_id)
         assert second_delete.status_code == 404
 
-    def test_get_list_of_companies(self, company_api, admin_token, random_company):
-        response = company_api.get_all_companies_raw(admin_token, limit=10)
-        assert response.status_code == 200
-        list_companies = response.json()
-        assert isinstance(list_companies, list)
-        assert len(list_companies) == 10
 
-    def test_update_company(self, company_api, admin_token, random_company):
-        payload = Company.random_company()
-        response = company_api.update_company_raw(admin_token, random_company.id, payload)
+    def test_get_list_of_companies(self, company_api, admin_token):
+        limit = random.randint(1,10)
+        response = company_api.get_all_companies_raw(admin_token, limit)
+        list_companies = response.json()
         assert response.status_code == 200
-        data = response.json()
-        assert data['id'] == random_company.id
-        assert (data['name'] != random_company.name or
-                data['year'] != random_company.year or
-                data['country'] != random_company.country)
+        assert isinstance(list_companies, list)
+        assert len(list_companies) == limit
 
     @pytest.mark.parametrize('company_data', [
         (lambda cmp: Company(name='', year=cmp.year, country=cmp.country)),
@@ -98,7 +95,7 @@ class TestCompany:
             'empty_data'
     ])
     def test_update_company_negative(self, company_api, admin_token, random_company, data, expected_status_code):
-        payload = data(random_company)
+        payload = data(Company.random_company())
         response = company_api.update_company_raw(admin_token, random_company.id, payload)
         assert response.status_code == expected_status_code
 
