@@ -1,13 +1,9 @@
-
-
 import pytest
+import sqlite3
 from users import User
-
-def test_simple_way(user_with_role: User):
-    print("test_simple_way")
-    print(user_with_role)
-
-@pytest.mark.parametrize("user_with_role", ["WRITE", "ADMIN", "READ", "WRITE", "ADMIN"], indirect=True)
-def test_parametrize_fixture(user_with_role: User):
-    print("test_parametrize_fixture")
-    print(user_with_role)
+        
+def test_x():
+    con = sqlite3.connect("/Users/mac/Documents/projects/go/course-go/course.db")
+    cursor = con.execute("select * from user where user.id=2")
+    for user in cursor.fetchall():
+        print(user)

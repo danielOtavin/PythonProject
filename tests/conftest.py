@@ -39,7 +39,7 @@ def admin_token(token_api: Token):
 def user_token(request: pytest.FixtureRequest, token_api: Token):
     return token_api.get_token(user=TEST)
 
-@pytest.fixture(scope="session", autouse=True)
+# @pytest.fixture(scope="session", autouse=True)
 def ensure_test_user(admin_token, user_api, token_api):
     response = token_api.get_token_raw(TEST)
     if response.status_code != 200:
