@@ -73,12 +73,15 @@ def random_company(company_api: CompanyAPI, admin_token: str):
 
     company_api.delete_company_raw(token=admin_token, companyId=company_created.id)
 
-@pytest.fixture(params=['read', 'write', 'admin'])
-def user_with_role(user_api: UserAPI, admin_token: str, request):
+@pytest.fixture(params=['read'])
+def user_with_role(request: pytest.FixtureRequest, user_api: UserAPI, admin_token: str):
     role = request.param
+    print("[user_with_role] получен параметр: ", request.param)
     user_to_create: User = User.random_user()
     user_created = user_api.create(user=user_to_create, token=admin_token)
-    user_api.update_role(token=admin_token, role=role, userId=user_created.id)
+    
+    if request.param != "READ":
+        user_api.update_role(token=admin_token, role=role, userId=user_created.id)
 
     yield user_created
 

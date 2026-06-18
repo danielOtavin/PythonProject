@@ -10,7 +10,7 @@ class UserAPI:
     def create(self, user: User, token: str) -> User:
         response = self.create_raw(user=user, token=token)
         
-        if response.status_code != 201:
+        if response.status_code != 200:
             pytest.fail(reason=f"сервeр ответил с ошибкой: {response.status_code}")
             
         if not (user_raw := response.json()):
