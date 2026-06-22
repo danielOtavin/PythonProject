@@ -9,7 +9,9 @@ class User(BaseModel):
     @staticmethod
     def random_user():
         fake = faker.Faker('ru_RU')
-        return User(login=fake.email(), password=fake.password(length=12))
+        return User(login=fake.user_name() + "@mail.ru",
+                    password=fake.password(length=12)
+                    )
 
 
 

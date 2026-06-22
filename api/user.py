@@ -39,6 +39,7 @@ class UserAPI:
              headers=auth_headers(token),
         )
 
+
     def update_role_raw(self, token: str, userId: int, role: str) -> requests.Response:
         return requests.patch(
             url=f'{Config.url}/users/{userId}/role/{role}',

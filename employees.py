@@ -1,6 +1,6 @@
 import random
 import faker
-from pydantic import BaseModel, StrictInt, StrictStr
+from pydantic import BaseModel, StrictStr, StrictInt
 
 
 class Employee(BaseModel):

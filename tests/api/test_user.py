@@ -1,8 +1,6 @@
 import faker
 import pytest
 
-
-from tests.conftest import admin_token, token_api
 from users import User, ERROR
 
 

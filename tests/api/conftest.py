@@ -1,5 +1,3 @@
-from typing import Generator
-
 import pytest
 from api.company import CompanyAPI
 from api.employee import EmployeeAPI
