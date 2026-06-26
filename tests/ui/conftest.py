@@ -1,21 +1,19 @@
 import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
 
+from browsers import ChromeManager, FirefoxManager, EdgeManager
 from users import User
 
 
-@pytest.fixture(scope='function')
-def browser():
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
-    driver.maximize_window()
-    yield driver
-    driver.quit()
+@pytest.fixture(scope='function', params=[ChromeManager, FirefoxManager, EdgeManager])
+def browser(request):
+    manager = request.param()
+    browser = manager.get_driver()
+    browser.maximize_window()
+    yield browser
+    browser.quit()
 
 @pytest.fixture(scope='function')
 def registration_user_with_role_read(browser):
