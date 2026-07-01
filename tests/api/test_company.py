@@ -2,7 +2,7 @@ import random
 
 import allure
 import pytest
-from companies import Company
+from models.companies import Company
 
 @allure.feature('API Компании')
 class TestCompany:

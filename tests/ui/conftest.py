@@ -1,10 +1,12 @@
 import pytest
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
 
 from browsers import ChromeManager, FirefoxManager, EdgeManager
-from users import User
+from pages.admin_page import AdminPage
+from pages.companies_page import CompanyPage
+from pages.employees_page import EmployeePage
+from pages.home_page import HomePage
+from pages.sql_page import SQLPage
+from tests.conftest import user_token
 
 
 @pytest.fixture(scope='function', params=[ChromeManager, FirefoxManager, EdgeManager])
@@ -15,53 +17,50 @@ def browser(request):
     yield browser
     browser.quit()
 
+
 @pytest.fixture(scope='function')
-def registration_user_with_role_read(browser):
-    user = User.random_user()
-    login = user.login
-    password = user.password
+def admin_authorization(browser, admin_token) -> HomePage:
     browser.get('http://127.0.0.1:8010/ui/login')
-    browser.find_element(By.XPATH, "//a[@href='user/signup']").click()
-    WebDriverWait(browser, 10).until(
-        expected_conditions.url_contains('/ui/user/signup')
-    )
-    browser.find_element(By.XPATH, "//input[@id='email']").send_keys(login)
-    browser.find_element(By.XPATH, "//input[@id='password']").send_keys(password)
-    browser.find_element(By.XPATH, "//input[@value='Зарегистрироваться']").click()
-    WebDriverWait(browser, 10).until(
-        expected_conditions.alert_is_present()
-    )
-    browser.switch_to.alert.accept()
-    WebDriverWait(browser, 10).until(
-        expected_conditions.url_contains("/ui/login")
-    )
-    yield browser, login, password
-
-@pytest.fixture(scope='function')
-def basic_authorization(browser):
-    def _login(login: str, password: str):
-        browser.find_element(By.NAME, 'username').send_keys(login)
-        browser.find_element(By.NAME, 'password').send_keys(password)
-        browser.find_element(By.XPATH, "//button[@onclick='handleLogin()']").click()
-        WebDriverWait(browser, 3).until(expected_conditions.alert_is_present())
-        browser.switch_to.alert.accept()
-        WebDriverWait(browser, 5).until(
-            expected_conditions.url_contains("/ui/home")
-        )
-        return browser
-    yield _login
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
+    browser.refresh()
+    return HomePage(browser)
 
 
 @pytest.fixture(scope='function')
-def admin_authorization(browser):
+def user_authorization(browser, user_token) -> HomePage:
     browser.get('http://127.0.0.1:8010/ui/login')
-    browser.find_element(By.NAME, 'username').send_keys('admin')
-    browser.find_element(By.NAME, 'password').send_keys('admin')
-    browser.find_element(By.XPATH, "//button[@onclick='handleLogin()']").click()
-    WebDriverWait(browser, 3).until(expected_conditions.alert_is_present())
-    browser.switch_to.alert.accept()
-    WebDriverWait(browser, 5).until(
-        expected_conditions.url_contains("/ui/home")
-    )
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
+    browser.refresh()
+    return HomePage(browser)
 
-    yield browser
+
+@pytest.fixture(scope='function')
+def admin_page(browser, admin_token) -> AdminPage:
+    browser.get('http://127.0.0.1:8010/ui/login')
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
+    browser.refresh()
+    return AdminPage(browser)
+
+
+@pytest.fixture(scope='function', params=[admin_token, user_token])
+def employees_page(browser, request) -> EmployeePage:
+    browser.get('http://127.0.0.1:8010/ui/employees')
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.param}');")
+    browser.refresh()
+    return EmployeePage(browser)
+
+
+@pytest.fixture(scope='function', params=[admin_token, user_token])
+def companies_page(browser, request) -> CompanyPage:
+    browser.get('http://127.0.0.1:8010/ui/companies')
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.param}');")
+    browser.refresh()
+    return CompanyPage(browser)
+
+
+@pytest.fixture(scope='function', params=[admin_token, user_token])
+def sql_page(browser, request) -> SQLPage:
+    browser.get('http://127.0.0.1:8010/ui/sql')
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.param}');")
+    browser.refresh()
+    return SQLPage(browser)

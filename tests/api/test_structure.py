@@ -1,7 +1,7 @@
 import pytest
 
 from api.structure import StructureAPI
-from employees import Employee
+from models.employees import Employee
 
 class TestStructure:
     @pytest.mark.parametrize("employee_count", [1, 5])

@@ -4,9 +4,9 @@ from api.employee import EmployeeAPI
 from api.structure import StructureAPI
 from api.token import Token
 from api.user import UserAPI
-from companies import Company
-from employees import Employee
-from users import ADMIN, TEST, User
+from models.companies import Company
+from models.employees import Employee
+from models.users import ADMIN, TEST, User
 
 @pytest.fixture(scope="session")
 def token_api():

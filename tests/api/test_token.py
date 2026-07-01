@@ -1,10 +1,10 @@
 import json
 import requests
-import users
+from models import users
 from api.token import Token
 from api.user import UserAPI
 from config import Config
-from users import ADMIN, User
+from models.users import ADMIN, User
 
 
 class TestToken:
@@ -41,7 +41,7 @@ class TestToken:
         assert role_change.status_code == 403
 
     def test_get_token_without_password(self, token_api):
-        created_user = User(login=  users.TEST.login, password= '')
+        created_user = User(login=  users.TEST.login, password='')
         result = token_api.get_token_raw(created_user)
         assert result.status_code == 401
         assert not result.json().get('token')
@@ -60,7 +60,7 @@ class TestToken:
         assert not result.json().get('token')
 
     def test_get_token_with_invalid_password(self, token_api):
-        created_user = User(login=users.TEST.login, password = users.TEST.password + 'a')
+        created_user = User(login=users.TEST.login, password =users.TEST.password + 'a')
         result = token_api.get_token_raw(created_user)
         assert result.status_code == 401
         assert not result.json().get('token')

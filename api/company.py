@@ -2,7 +2,7 @@ import pytest
 import requests
 
 from api.base import auth_headers
-from companies import Company
+from models.companies import Company
 from config import Config
 
 

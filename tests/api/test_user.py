@@ -1,7 +1,7 @@
 import faker
 import pytest
 
-from users import User, ERROR
+from models.users import User, ERROR
 
 
 class TestUserPositive:

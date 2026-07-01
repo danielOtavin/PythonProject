@@ -2,7 +2,7 @@ import pytest
 import requests
 
 from config import Config
-from users import User
+from models.users import User
 from api.base import auth_headers
 
 

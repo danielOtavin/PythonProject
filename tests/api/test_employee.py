@@ -1,6 +1,6 @@
 import allure
 import pytest
-from employees import Employee
+from models.employees import Employee
 
 
 @allure.feature('Employee API')

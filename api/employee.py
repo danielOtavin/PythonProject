@@ -3,7 +3,7 @@ import requests
 
 from api.base import auth_headers
 from config import Config
-from employees import Employee
+from models.employees import Employee
 
 
 class EmployeeAPI:
