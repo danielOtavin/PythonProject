@@ -10,7 +10,7 @@ class User(BaseModel):
     def random_user():
         fake = faker.Faker('ru_RU')
         return User(
-            login=f"{fake.user_name()}@{fake.domain_name()}.ru",
+            login=f"{fake.user_name()}@{fake.domain_word()}.ru",
             password=fake.password(length=12)
         )
 

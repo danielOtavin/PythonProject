@@ -8,13 +8,15 @@ class AdminPage(BasePage):
         return f'//select[@id="role-select-{str(usr_id)}"]'
 
     def get_role_option(self, usr_id: int = 2, role_val: str = 'read'):
-        return f'//select[@id="role-select-{str(usr_id)}"]/option[@value={role_val}]'
+        return f'//select[@id="role-select-{str(usr_id)}"]/option[@value="{role_val}"]'
 
 
     def click_role_change_button(self, usr_id: int, role_val: str):
-        self.click_element(self.get_role_option(usr_id=usr_id, role_val=role_val))
-        self.wait_until_visible('//div[@class="notification-message"]')
-        self.wait_until_invisible('//div[@class="notification hidden"]')
+        self.click_element(self.get_select_role(usr_id))
+        self.click_element(self.get_role_option(usr_id, role_val))
+        self.wait_until_visible('//div[contains(@class, "notification-message")]')
+        self.wait_until_invisible('//div[contains(@class, "notification-message")]')
+
 
     def click_delete_user_button(self, usr_id: int):
         row_path = f'//tr[@data-user-id="{str(usr_id)}"]'
