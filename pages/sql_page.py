@@ -2,22 +2,23 @@ from pages.base_page import BasePage
 
 
 class SQLPage(BasePage):
-    text_area = '//textarea[@id="sql-input"]'
-    query_radio_button = '//button[@id="query-radio"]'
-    command_radio_button = '//button[@id="command-radio"]'
-    send_request_button = '//button[@id="send-request"]'
+    PATH = '/ui/sql'
+    TEXT_AREA = '//textarea[@id="sql-input"]'
+    QUERY_RADIO_BUTTON = '//button[@id="query-radio"]'
+    COMMAND_RADIO_BUTTON = '//button[@id="command-radio"]'
+    SEND_REQUEST_BUTTON = '//button[@id="send-request"]'
 
 
     def send_sql_query(self, text: str):
-        self.input_value(self.text_area, text)
-        self.click_element(self.query_radio_button)
-        self.click_element(self.send_request_button)
+        self.input_value(self.TEXT_AREA, text)
+        self.click_element(self.QUERY_RADIO_BUTTON)
+        self.click_element(self.SEND_REQUEST_BUTTON)
 
 
     def send_sql_command(self, text: str):
-        self.input_value(self.text_area, text)
-        self.click_element(self.command_radio_button)
-        self.click_element(self.send_request_button)
+        self.input_value(self.TEXT_AREA, text)
+        self.click_element(self.COMMAND_RADIO_BUTTON)
+        self.click_element(self.SEND_REQUEST_BUTTON)
 
 
 

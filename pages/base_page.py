@@ -10,6 +10,13 @@ class BasePage:
         self.timeout = timeout
         self.wait = WebDriverWait(driver, timeout=timeout)
 
+    BASE_URL = 'http://127.0.0.1:8010'
+    PATH = None
+
+    def open(self) -> WebElement:
+        return self.driver.get(self.BASE_URL + self.PATH)
+
+
     def wait_until_visible(self, path: str) -> WebElement:
         return self.wait.until(EC.visibility_of_element_located((By.XPATH, path)))
 

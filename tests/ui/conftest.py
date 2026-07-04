@@ -1,8 +1,12 @@
 import pytest
+from selenium.webdriver.ie.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 
+import browsers
 from browsers import ChromeManager, FirefoxManager, EdgeManager
 from config import Config
 from pages.admin_page import AdminPage
+from pages.base_page import BasePage
 from pages.companies_page import CompanyPage
 from pages.employees_page import EmployeePage
 from pages.home_page import HomePage
@@ -13,7 +17,7 @@ from tests.conftest import user_token, admin_token
 
 
 @pytest.fixture(scope='function', params=[ChromeManager, FirefoxManager, EdgeManager])
-def browser(request):
+def browser(request) -> WebDriver:
     manager = request.param()
     browser = manager.get_driver()
     browser.maximize_window()
@@ -21,61 +25,41 @@ def browser(request):
     browser.quit()
 
 
-@pytest.fixture(scope='function')
-def admin_authorization(browser, admin_token) -> HomePage:
+@pytest.fixture(scope='function', params=[admin_token, user_token])
+def authorization(browser, admin_token, request) -> HomePage:
     browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
-    browser.get(f'{Config.url}/ui/home')
-    return HomePage(browser)
-
-
-@pytest.fixture(scope='function')
-def user_authorization(browser, user_token) -> HomePage:
-    browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
-    browser.get(f'{Config.url}/ui/home')
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.params}');")
+    browser.open(HomePage.PATH)
     return HomePage(browser)
 
 
 @pytest.fixture(scope='function')
 def login_page(browser) -> LoginPage:
-    browser.get(f'{Config.url}/ui/login')
+    login_page = LoginPage(browser)
+    login_page.open()
     return LoginPage(browser)
 
 
 @pytest.fixture(scope='function')
 def signup_page(browser) -> SignupPage:
-    browser.get(f'{Config.url}/ui/user/signup')
+    signup_page = SignupPage(browser)
+    signup_page.open()
     return SignupPage(browser)
 
 
-@pytest.fixture(scope='function')
-def admin_page(browser, admin_token) -> AdminPage:
-    browser.get(Config.url)
+@pytest.fixture(scope='function', params=[AdminPage, EmployeePage, CompanyPage, SQLPage])
+def pages_admin_token(request, browser, admin_token):
+    page = request.param(browser)
+    page.open()
     browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
-    browser.get(f'{Config.url}/ui/admin')
-    return AdminPage(browser)
+    browser.refresh()
+    return page
 
 
-@pytest.fixture(scope='function', params=[admin_token, user_token])
-def employees_page(browser, request) -> EmployeePage:
-    browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.param}');")
-    browser.get(f'{Config.url}/ui/employees')
-    return EmployeePage(browser)
-
-
-@pytest.fixture(scope='function', params=[admin_token, user_token])
-def companies_page(browser, request) -> CompanyPage:
-    browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.param}');")
-    browser.get(f'{Config.url}/ui/companies')
-    return CompanyPage(browser)
-
-
-@pytest.fixture(scope='function', params=[admin_token, user_token])
-def sql_page(browser, request) -> SQLPage:
-    browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.param}');")
-    browser.get(f'{Config.url}/ui/sql')
-    return SQLPage(browser)
+@pytest.fixture(scope='function', params=[EmployeePage, CompanyPage, SQLPage])
+def pages_user_token(request, browser, user_token):
+    page = request.param(browser)
+    page.open()
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
+    browser.refresh()
+    return page

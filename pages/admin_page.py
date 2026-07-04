@@ -4,24 +4,32 @@ from pages.base_page import BasePage
 
 
 class AdminPage(BasePage):
+    PATH = '/ui/admin'
+    NOTIFICATION_MESSAGE = '//div[contains(@class, "notification-message")]'
+    DELETE_BUTTON = './/button[@class="delete-btn"]'
+
     def get_select_role(self, usr_id: int = 2):
         return f'//select[@id="role-select-{str(usr_id)}"]'
 
     def get_role_option(self, usr_id: int = 2, role_val: str = 'read'):
         return f'//select[@id="role-select-{str(usr_id)}"]/option[@value="{role_val}"]'
 
+    def get_row_path(self, usr_id: int = 2):
+        return f'//tr[@data-user-id="{str(usr_id)}"]'
+
+
 
     def click_role_change_button(self, usr_id: int, role_val: str):
         self.click_element(self.get_select_role(usr_id))
         self.click_element(self.get_role_option(usr_id, role_val))
-        self.wait_until_visible('//div[contains(@class, "notification-message")]')
-        self.wait_until_invisible('//div[contains(@class, "notification-message")]')
+        self.wait_until_visible(self.NOTIFICATION_MESSAGE)
+        self.wait_until_invisible(self.NOTIFICATION_MESSAGE)
 
 
     def click_delete_user_button(self, usr_id: int):
-        row_path = f'//tr[@data-user-id="{str(usr_id)}"]'
-        row = self.wait_until_visible(row_path)
-        delete_button = row.find_element(By.XPATH, f'.//button[@class="delete-btn"]')
+        self.get_row_path(usr_id)
+        row = self.wait_until_visible(self.get_row_path(usr_id))
+        delete_button = row.find_element(By.XPATH, self.DELETE_BUTTON)
         self.click_element(delete_button)
         self.accept_alert()
-        self.wait_until_invisible(row_path)
+        self.wait_until_invisible(self.get_row_path(usr_id))
