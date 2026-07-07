@@ -33,7 +33,7 @@ def admin_token(token_api: Token):
     yield token_api.get_token(user=ADMIN)
 
 
-@pytest.fixture(scope='function', params=[TEST])
+@pytest.fixture(scope='function')
 def user_token(request: pytest.FixtureRequest, token_api: Token):
     return token_api.get_token(user=TEST)
 
