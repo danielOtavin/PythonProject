@@ -27,6 +27,8 @@ def browser(request) -> WebDriver:
 def authorization(browser, request, admin_token, user_token):
     token_name = request.param
     token = request.getfixturevalue(token_name)
+    home_page = HomePage(browser)
+    browser.get(BasePage.BASE_URL)
     browser.execute_script(f"window.localStorage.setItem('authToken', '{token}');")
 
 
