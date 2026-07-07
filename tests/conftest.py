@@ -34,7 +34,7 @@ def admin_token(token_api: Token):
 
 
 @pytest.fixture(scope='function')
-def user_token(request: pytest.FixtureRequest, token_api: Token):
+def user_token(request: pytest.FixtureRequest, token_api: Token) -> Token:
     return token_api.get_token(user=TEST)
 
 @pytest.fixture(scope="session", autouse=True)
@@ -45,7 +45,7 @@ def ensure_test_user(admin_token, user_api, token_api):
 
 
 @pytest.fixture(scope='function')
-def random_user(user_api: UserAPI, admin_token: str):
+def random_user(user_api: UserAPI, admin_token: str) -> User:
     user_to_create: User = User.random_user()
     user_created = user_api.create(user=user_to_create, token=admin_token)
 
