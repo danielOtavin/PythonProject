@@ -1,8 +1,6 @@
 import pytest
 from selenium.webdriver.ie.webdriver import WebDriver
-from selenium.webdriver.remote.webelement import WebElement
 
-import browsers
 from browsers import ChromeManager, FirefoxManager, EdgeManager
 from config import Config
 from pages.admin_page import AdminPage
@@ -25,12 +23,28 @@ def browser(request) -> WebDriver:
     browser.quit()
 
 
-@pytest.fixture(scope='function', params=[admin_token, user_token])
-def authorization(browser, admin_token, request) -> HomePage:
+@pytest.fixture(params=['admin_token', 'user_token'])
+def authorization(browser, request, admin_token, user_token):
+    token_name = request.param
+    token = request.getfixturevalue(token_name)
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{token}');")
+
+
+@pytest.fixture(scope='function')
+def authorization_admin(browser, admin_token, request) -> HomePage:
+    page = HomePage(browser)
     browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{request.params}');")
-    browser.open(HomePage.PATH)
-    return HomePage(browser)
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
+    page.open()
+    return page
+
+@pytest.fixture(scope='function')
+def authorization_user(browser, user_token, request) -> HomePage:
+    page = HomePage(browser)
+    browser.get(Config.url)
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
+    page.open()
+    return page
 
 
 @pytest.fixture(scope='function')
