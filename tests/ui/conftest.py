@@ -11,7 +11,6 @@ from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from pages.signup_page import SignupPage
 from pages.sql_page import SQLPage
-from tests.conftest import user_token, admin_token
 
 
 @pytest.fixture(scope='function', params=[ChromeManager, FirefoxManager, EdgeManager])
@@ -24,29 +23,14 @@ def browser(request) -> WebDriver:
 
 
 @pytest.fixture(params=['admin_token', 'user_token'])
-def authorization(browser, request, admin_token, user_token):
+def authorization(browser, request, admin_token, user_token) -> HomePage:
     token_name = request.param
     token = request.getfixturevalue(token_name)
     home_page = HomePage(browser)
     browser.get(BasePage.BASE_URL)
     browser.execute_script(f"window.localStorage.setItem('authToken', '{token}');")
-
-
-@pytest.fixture(scope='function')
-def authorization_admin(browser, admin_token, request) -> HomePage:
-    page = HomePage(browser)
-    browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
-    page.open()
-    return page
-
-@pytest.fixture(scope='function')
-def authorization_user(browser, user_token, request) -> HomePage:
-    page = HomePage(browser)
-    browser.get(Config.url)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
-    page.open()
-    return page
+    home_page.open()
+    return home_page
 
 
 @pytest.fixture(scope='function')
@@ -64,22 +48,18 @@ def signup_page(browser) -> SignupPage:
 
 
 @pytest.fixture(scope='function', params=[AdminPage, EmployeePage, CompanyPage, SQLPage])
-def pages_admin_token(request, browser, admin_token):
+def pages_admin_token(request, browser, admin_token) -> AdminPage|EmployeePage|CompanyPage|SQLPage:
     browser.get(BasePage.BASE_URL)
     browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
     page = request.param(browser)
     page.open()
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
-    browser.refresh()
     return page
 
 
 @pytest.fixture(scope='function', params=[EmployeePage, CompanyPage, SQLPage])
-def pages_user_token(request, browser, user_token):
+def pages_user_token(request, browser, user_token) -> EmployeePage|CompanyPage|SQLPage:
     browser.get(BasePage.BASE_URL)
     browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
     page = request.param(browser)
     page.open()
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
-    browser.refresh()
     return page
