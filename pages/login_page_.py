@@ -3,6 +3,10 @@ from pages.home_page import HomePage
 
 
 class LoginPage(BasePage):
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.header = Header(driver, self)
+
     PATH = '/ui/login'
     USERNAME = '//input[@name="username"]'
     PASSWORD = '//input[@name="password"]'
