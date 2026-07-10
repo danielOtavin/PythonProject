@@ -4,6 +4,10 @@ from pages.base_page import BasePage
 
 
 class EmployeePage(BasePage):
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.header = Header(driver, self)
+
     PATH = '/ui/employees'
     VIEW_BUTTON = './/svg[@class="icon eye-icon"]'
     UPDATE_INFO_BUTTON = './/svg[@class="icon pencil-icon  "]'
