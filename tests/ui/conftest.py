@@ -1,14 +1,15 @@
+import sqlite3
+
 import pytest
 from selenium.webdriver.ie.webdriver import WebDriver
 
 from browsers import ChromeManager, FirefoxManager, EdgeManager
-from config import Config
 from pages.admin_page import AdminPage
 from pages.base_page import BasePage
 from pages.companies_page import CompanyPage
 from pages.employees_page import EmployeePage
 from pages.home_page import HomePage
-from pages.login_page import LoginPage
+from pages.login_page_ import LoginPage
 from pages.signup_page import SignupPage
 from pages.sql_page import SQLPage
 
@@ -22,7 +23,7 @@ def browser(request) -> WebDriver:
     browser.quit()
 
 
-@pytest.fixture(params=['admin_token', 'user_token'])
+@pytest.fixture(scope='function', params=['admin_token', 'user_token'])
 def authorization(browser, request, admin_token, user_token) -> HomePage:
     token_name = request.param
     token = request.getfixturevalue(token_name)
@@ -37,14 +38,13 @@ def authorization(browser, request, admin_token, user_token) -> HomePage:
 def login_page(browser) -> LoginPage:
     login_page = LoginPage(browser)
     login_page.open()
-    return LoginPage(browser)
-
+    return login_page
 
 @pytest.fixture(scope='function')
 def signup_page(browser) -> SignupPage:
     signup_page = SignupPage(browser)
     signup_page.open()
-    return SignupPage(browser)
+    return signup_page
 
 
 @pytest.fixture(scope='function', params=[AdminPage, EmployeePage, CompanyPage, SQLPage])

@@ -1,6 +1,8 @@
 from selenium.webdriver.common.by import By
+from typing import Literal
 
 from pages.base_page import BasePage
+from pages.components.header import Header
 
 
 class EmployeePage(BasePage):
@@ -24,13 +26,8 @@ class EmployeePage(BasePage):
             raise ValueError(f'Неизвестная кнопка: {button}')
         selected_button = button_name[button]
         employee = self.find_element(self.get_employee_item(emp_id))
-        button = employee.find_element(By.XPATH, self.UPDATE_INFO_BUTTON)
-        self.click_element(button)
-
-    def click_delete_button(self, emp_id: int) -> None:
-        employee = self.find_element(self.get_employee_item(emp_id))
-        button = employee.find_element(By.XPATH, self.DELETE_BUTTON)
-        self.click_element(button)
+        btn = employee.find_element(By.XPATH, selected_button)
+        self.click_element(btn)
 
 
 

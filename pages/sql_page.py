@@ -1,4 +1,6 @@
+from typing import Literal
 from pages.base_page import BasePage
+from pages.components.header import Header
 
 
 class SQLPage(BasePage):
@@ -19,14 +21,11 @@ class SQLPage(BasePage):
             raise ValueError(f'Неизвестная кнопка: {button}')
         btn = selected_button[button]
         self.input_value(self.TEXT_AREA, text)
-        self.click_element(self.QUERY_RADIO_BUTTON)
+        self.click_element(btn)
         self.click_element(self.SEND_REQUEST_BUTTON)
 
 
-    def send_sql_command(self, text: str):
-        self.input_value(self.TEXT_AREA, text)
-        self.click_element(self.COMMAND_RADIO_BUTTON)
-        self.click_element(self.SEND_REQUEST_BUTTON)
+
 
 
 
