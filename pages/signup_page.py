@@ -11,5 +11,8 @@ class SignupPage(BasePage):
         self.input_value(self.EMAIL_FIELD, email)
         self.input_value(self.PASSWORD_FIELD, password)
         self.click_element(self.SUBMIT_BUTTON)
+        self.accept_alert()
+        return LoginPage(self.driver)
+
 
 
