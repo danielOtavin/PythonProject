@@ -11,11 +11,13 @@ class HomePage(BasePage):
         self.click_element(self.EMPLOYEES_BUTTON)
         BasePage.wait_until_url_contains(self, '/ui/employees')
 
-    def click_companies(self):
-        self.click_element(self.COMPANIES_BUTTON)
-        self.wait_until_url_contains('/ui/companies')
-
-    def click_sql(self):
-        self.click_element(self.SQL_BUTTON)
-        self.wait_until_url_contains('/ui/sql')
+    def click_button_home_page(self, button: Literal['employees', 'companies', 'sql']) -> None:
+        selected_button = {'employees': (self.EMPLOYEES_BUTTON, '/ui/employees'),
+                           'companies': (self.COMPANIES_BUTTON, '/ui/companies'),
+                           'sql': (self.SQL_BUTTON, '/ui/sql')}
+        if button not in selected_button:
+            raise ValueError(f'Неизвестная кнопка: {button}')
+        locator, url = selected_button[button]
+        self.click_element(locator)
+        self.wait_until_url_contains(url)
 
