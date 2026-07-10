@@ -2,6 +2,10 @@ from pages.base_page import BasePage
 
 
 class HomePage(BasePage):
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.header = Header(driver, self)
+
     PATH = '/ui/home'
     EMPLOYEES_BUTTON = '//a[@href="/ui/employees"]'
     COMPANIES_BUTTON = '//a[@href="/ui/companies"]'
