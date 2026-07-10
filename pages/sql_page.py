@@ -2,6 +2,10 @@ from pages.base_page import BasePage
 
 
 class SQLPage(BasePage):
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.header = Header(driver, self)
+
     PATH = '/ui/sql'
     TEXT_AREA = '//textarea[@id="sql-input"]'
     QUERY_RADIO_BUTTON = '//button[@id="query-radio"]'
