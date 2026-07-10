@@ -63,3 +63,23 @@ def pages_user_token(request, browser, user_token) -> EmployeePage|CompanyPage|S
     page = request.param(browser)
     page.open()
     return page
+
+
+@pytest.fixture(scope='function')
+def delete_user_from_db():
+    def _delete(username):
+        conn = sqlite3.connect('course.db')
+        cursor = conn.cursor()
+        cursor.execute('DELETE * FROM user WHERE login = ?', (username,))
+        cursor.fetchall()
+        conn.close()
+    return _delete
+
+@pytest.fixture(scope='function')
+def clean_db():
+    yield
+    conn = sqlite3.connect('course.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM user WHERE login != 'admin'")
+    conn.commit()
+    conn.close()
