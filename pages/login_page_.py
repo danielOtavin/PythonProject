@@ -18,5 +18,5 @@ class LoginPage(BasePage):
         self.input_value(self.PASSWORD, password)
         self.click_element(self.LOGIN_BUTTON)
         self.accept_alert()
-        self.wait_until_url_contains('/ui/home')
+        self.wait_until_url_contains(HomePage.PATH)
         return HomePage(self.driver)
