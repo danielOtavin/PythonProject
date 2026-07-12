@@ -1,13 +1,10 @@
-from pages.base_page import BasePage
-
-
 class Header:
     def __init__(self, driver, page):
         self.driver = driver
         self.page = page
 
-    home_button = '//div[@onclick="redirectToHome()"]'
-    quit_button = '//div[@onclick="window.logoutUser()"]'
+    home_button = '//div[@class="home-button"]'
+    quit_button = '//div[@class="logout-button"]'
     user_info = '//div[@class="user-info"]'
     admin_button = '//a[@href="admin"]'
 
@@ -21,3 +18,7 @@ class Header:
     def click_admin(self):
         self.page.click_element(self.admin_button)
         self.page.wait_until_url_contains('/ui/admin')
+
+    def click_home(self):
+        self.page.click_element(self.home_button)
+        self.page.wait_until_url_contains('/ui/home')

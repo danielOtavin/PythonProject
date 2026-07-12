@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Literal, Callable
 
 import pytest
 from selenium.webdriver.ie.webdriver import WebDriver
@@ -48,14 +49,14 @@ def signup_page(browser) -> SignupPage:
 
 
 @pytest.fixture(scope='function', params=[AdminPage, EmployeePage, CompanyPage, SQLPage])
-def pages_admin_token(request, browser, admin_token) -> AdminPage|EmployeePage|CompanyPage|SQLPage:
+def pages_admin_token(request, browser, admin_token):
     browser.get(BasePage.BASE_URL)
     browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
     page = request.param(browser)
     page.open()
     yield page
 
-    
+
 @pytest.fixture(scope='function')
 def page_specific_admin_token(browser, admin_token):
     def open_page(page_name: Literal['AdminPage', 'EmployeePage', 'CompanyPage', 'SQLPage']) -> AdminPage|EmployeePage|CompanyPage|SQLPage:
@@ -75,7 +76,7 @@ def page_specific_admin_token(browser, admin_token):
 
 
 @pytest.fixture(scope='function', params=[EmployeePage, CompanyPage, SQLPage])
-def pages_user_token(request, browser, user_token) -> EmployeePage|CompanyPage|SQLPage:
+def pages_user_token(request, browser, user_token):
     browser.get(BasePage.BASE_URL)
     browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
     page = request.param(browser)
@@ -100,8 +101,11 @@ def page_specific_user_token(browser, user_token):
 
 
 @pytest.fixture(scope='function')
-def delete_user_from_db():
-    def _delete(username):
+def delete_from_db():
+    def _delete(table_name: Literal['user', 'employee', 'company'], obj_name):
+        field_dict = {'user': 'login',
+                      'employee': 'name',
+                      'company': 'name'}
         conn = sqlite3.connect('course.db')
         cursor = conn.cursor()
         if table_name not in field_dict:
@@ -114,6 +118,7 @@ def delete_user_from_db():
         conn.commit()
         conn.close()
     return _delete
+
 
 @pytest.fixture(scope='function')
 def db_check_obj():
