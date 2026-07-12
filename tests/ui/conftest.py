@@ -116,10 +116,37 @@ def delete_user_from_db():
     return _delete
 
 @pytest.fixture(scope='function')
-def clean_db():
-    yield
-    conn = sqlite3.connect('course.db')
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM user WHERE login != 'admin'")
-    conn.commit()
-    conn.close()
+def db_check_obj():
+    def check_name(table_name: Literal['user', 'employee', 'company'], obj_name: str):
+        field_dict = {'user': 'login',
+                      'employee': 'name',
+                      'company': 'name'}
+        conn = sqlite3.connect('course.db')
+        cursor = conn.cursor()
+        if table_name not in field_dict:
+            raise ValueError(f'Несуществующая таблица: {table_name}')
+        field = field_dict[table_name]
+
+        cursor.execute(f'SELECT * FROM {table_name} WHERE {field} = ?', (obj_name,))
+        result = cursor.fetchall()
+        conn.close()
+        return result
+    return check_name
+
+@pytest.fixture(scope='function')
+def clean_table_db():
+    def _clean(table_name: Literal['user', 'employee', 'company']):
+        conn = sqlite3.connect('course.db')
+        cursor = conn.cursor()
+        script_dict = {'user': "DELETE FROM user WHERE login != 'admin'",
+                       'employee': "DELETE FROM employee",
+                       'company': "DELETE FROM company"}
+        if table_name not in script_dict:
+            raise ValueError(f'Несуществующая таблица: {table_name}')
+        script = script_dict[table_name]
+        cursor.execute(script)
+        conn.commit()
+        conn.close()
+    return _clean
+
+
