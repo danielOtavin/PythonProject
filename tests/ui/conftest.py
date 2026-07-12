@@ -80,7 +80,23 @@ def pages_user_token(request, browser, user_token) -> EmployeePage|CompanyPage|S
     browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
     page = request.param(browser)
     page.open()
-    return page
+    yield page
+
+@pytest.fixture(scope='function')
+def page_specific_user_token(browser, user_token):
+    def open_page(page_name: Literal['EmployeePage','CompanyPage','SQLPage']) -> EmployeePage|CompanyPage|SQLPage:
+        pages_dict = {'EmployeePage': EmployeePage,
+                      'CompanyPage': CompanyPage,
+                      'SQLPage': SQLPage}
+        if page_name not in pages_dict:
+            raise ValueError(f'Страницы {page_name} не существует')
+        selected_page = pages_dict[page_name]
+        browser.get(BasePage.BASE_URL)
+        browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
+        page = selected_page(browser)
+        page.open()
+        return page
+    return open_page
 
 
 @pytest.fixture(scope='function')
