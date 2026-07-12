@@ -104,8 +104,14 @@ def delete_user_from_db():
     def _delete(username):
         conn = sqlite3.connect('course.db')
         cursor = conn.cursor()
-        cursor.execute('DELETE * FROM user WHERE login = ?', (username,))
-        cursor.fetchall()
+        if table_name not in field_dict:
+            raise ValueError(f'Несуществующая таблица: {table_name}')
+        field = field_dict[table_name]
+        cursor.execute(f'SELECT * FROM {table_name} WHERE {field} = ?', (obj_name,))
+        if not cursor.fetchone():
+            raise ValueError(f'Объект {obj_name} не найден в {table_name}')
+        cursor.execute(f'DELETE FROM {table_name} WHERE {field} = ?', (obj_name,))
+        conn.commit()
         conn.close()
     return _delete
 
