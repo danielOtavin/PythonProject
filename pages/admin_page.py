@@ -27,8 +27,6 @@ class AdminPage(BasePage):
     def click_role_change_button(self, usr_id: int, role_val: str):
         self.click_element(self.get_select_role(usr_id))
         self.click_element(self.get_role_option(usr_id, role_val))
-        self.wait_until_visible(self.NOTIFICATION_MESSAGE)
-        self.wait_until_invisible(self.NOTIFICATION_MESSAGE)
 
 
     def click_delete_user_button(self, usr_id: int):
