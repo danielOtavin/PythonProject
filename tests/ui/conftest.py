@@ -53,7 +53,25 @@ def pages_admin_token(request, browser, admin_token) -> AdminPage|EmployeePage|C
     browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
     page = request.param(browser)
     page.open()
-    return page
+    yield page
+
+    
+@pytest.fixture(scope='function')
+def page_specific_admin_token(browser, admin_token):
+    def open_page(page_name: Literal['AdminPage', 'EmployeePage', 'CompanyPage', 'SQLPage']) -> AdminPage|EmployeePage|CompanyPage|SQLPage:
+        pages_dict = {'AdminPage': AdminPage,
+                      'EmployeePage': EmployeePage,
+                      'CompanyPage': CompanyPage,
+                      'SQLPage': SQLPage}
+        if page_name not in pages_dict:
+            raise ValueError(f'Страницы {page_name} не существует')
+        selected_page = pages_dict[page_name]
+        browser.get(BasePage.BASE_URL)
+        browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
+        page = selected_page(browser)
+        page.open()
+        return page
+    return open_page
 
 
 @pytest.fixture(scope='function', params=[EmployeePage, CompanyPage, SQLPage])
