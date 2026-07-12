@@ -14,7 +14,7 @@ from pages.signup_page import SignupPage
 from pages.sql_page import SQLPage
 
 
-@pytest.fixture(scope='function', params=[ChromeManager, FirefoxManager, EdgeManager])
+@pytest.fixture(scope='session', params=[ChromeManager, FirefoxManager, EdgeManager])
 def browser(request) -> WebDriver:
     manager = request.param()
     browser = manager.get_driver()
