@@ -1,9 +1,10 @@
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from typing import Literal
 
+from models.employees import Employee
 from pages.base_page import BasePage
 from pages.components.header import Header
-
 
 class EmployeePage(BasePage):
     def __init__(self, driver):
@@ -25,7 +26,7 @@ class EmployeePage(BasePage):
     UPDATE_MODAL = '//div[@id="editModal"]'
     DELETE_MODAL = '//div[@id="deleteModal"]'
 
-    def get_employee_item(self, emp_id: int = 2) -> str:
+    def get_employee_item(self, emp_id: int = 0):
         return f'//div[@data-employee-id="{str(emp_id)}"]'
 
 
@@ -43,7 +44,7 @@ class EmployeePage(BasePage):
                        'delete': (self.DELETE_BUTTON, self.DELETE_MODAL)}
         pick_button, modal = options_dct[button]
         employee = self.find_element(self.get_employee_item(emp_id))
-        btn = employee.find_element(By.XPATH, selected_button)
+        btn = employee.find_element(By.XPATH, pick_button)
         self.click_element(btn)
         self.wait_until_visible(modal)
 

@@ -47,6 +47,14 @@ def signup_page(browser) -> SignupPage:
     signup_page.open()
     return signup_page
 
+@pytest.fixture(scope='function')
+def home_page(browser, admin_token):
+    browser.get(BasePage.BASE_URL)
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
+    page = HomePage(browser)
+    page.open()
+    return page
+
 
 @pytest.fixture(scope='function', params=[AdminPage, EmployeePage, CompanyPage, SQLPage])
 def pages_admin_token(request, browser, admin_token):

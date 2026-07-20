@@ -6,7 +6,8 @@ from models.users import ADMIN, User
 @allure.feature('Страница администратора')
 class TestAdminPage:
     @allure.title('')
-    def test_admin_page_user_role_change_and_delete_user(self, admin_token, page_specific_admin_token, user_api, db_check_obj):
+    def test_admin_page_user_role_change_and_delete_user(self, admin_token, page_specific_admin_token,
+                                                         user_api, db_check_obj):
         user_data = User.random_user()
         user = user_api.create(user_data, admin_token)
         assert len(db_check_obj('user', user.login)) > 0

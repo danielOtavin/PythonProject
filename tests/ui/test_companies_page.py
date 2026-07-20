@@ -1,0 +1,2 @@
+class TestCompaniesPage:
+    pass

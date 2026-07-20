@@ -1,4 +1,7 @@
 from typing import Literal
+
+from selenium.webdriver.common.by import By
+
 from pages.base_page import BasePage
 from pages.components.header import Header
 
@@ -13,6 +16,8 @@ class SQLPage(BasePage):
     QUERY_RADIO_BUTTON = '//input[@id="query-radio"]'
     COMMAND_RADIO_BUTTON = '//input[@id="command-radio"]'
     SEND_REQUEST_BUTTON = '//button[@id="send-request"]'
+    RESULT_SECTION = '//DIV[@id="result-section"]'
+
 
 
     def send_sql_query(self, text: str) -> None:
