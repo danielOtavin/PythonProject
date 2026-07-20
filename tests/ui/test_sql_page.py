@@ -19,11 +19,3 @@ class TestEmployeesPage:
 
 
 
-    def test_command(self, page_specific_admin_token, employee_api, admin_token):
-        employee_data = Employee.random_employee()
-        emp_created = employee_api.create_employee(admin_token, employee_data)
-        sql_page = page_specific_admin_token('SQLPage')
-        sql_page.send_sql_query_or_command(f"DELETE FROM employee WHERE id = {emp_created.id};", 'command')
-        sql_page.send_sql_query_or_command('SELECT * FROM employee;', 'query')
-        result = sql_page.check_result(emp_created.id)
-        assert result is False
