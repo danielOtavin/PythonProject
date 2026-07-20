@@ -10,9 +10,17 @@ class CompanyPage(BasePage):
         self.header = Header(driver, self)
 
     PATH = '/ui/companies'
-    VIEW_BUTTON = './/svg[@class="icon eye-icon"]'
-    UPDATE_INFO_BUTTON = './/svg[@class="icon pencil-icon  "]'
-    DELETE_BUTTON = './/svg[@class="icon trash-icon  "]'
+    VIEW_BUTTON = './/*[contains(@class, "eye-icon")]'
+    UPDATE_INFO_BUTTON = './/*[contains(@class, "pencil-icon")]'
+    DELETE_BUTTON = './/*[contains(@class, "trash-icon")]'
+    MODAL_WINDOW = '//div[@class="modal-content"]'
+    VIEW_MODAL = '//div[@id="viewModal"]'
+    UPDATE_MODAL = '//div[@id="editModal"]'
+    NAME_FIELD = './/div[@id="editCompanyName"]'
+    YEAR_FIELD = './/div[@id="editYear"]'
+    COUNTRY_FIELD = './/div[@id="editCountry"]'
+    SUBMIT_BUTTON = '//BUTTON[@type="submit"]'
+    CONTENT_WINDOW = ''
 
     def get_company_item(self, cmp_id: int = 2):
         return f'//div[data-company-id="{str(cmp_id)}"]'
