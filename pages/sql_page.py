@@ -14,19 +14,24 @@ class SQLPage(BasePage):
     COMMAND_RADIO_BUTTON = '//input[@id="command-radio"]'
     SEND_REQUEST_BUTTON = '//button[@id="send-request"]'
 
-    def send_sql_query_or_command(self,  text: str, button: Literal['query', 'command']) -> None:
-        selected_button = {'query': self.QUERY_RADIO_BUTTON,
-                           'command': self.COMMAND_RADIO_BUTTON}
-        if button not in selected_button:
-            raise ValueError(f'Неизвестная кнопка: {button}')
-        btn = selected_button[button]
+
+    def send_sql_query(self, text: str) -> None:
         self.input_value(self.TEXT_AREA, text)
-        self.click_element(btn)
+        self.click_element(self.QUERY_RADIO_BUTTON)
         self.click_element(self.SEND_REQUEST_BUTTON)
+        self.clear_field(self.TEXT_AREA)
+
+    def send_sql_command(self, text: str) -> None:
+        self.input_value(self.TEXT_AREA, text)
+        self.click_element(self.COMMAND_RADIO_BUTTON)
+        self.click_element(self.SEND_REQUEST_BUTTON)
+        self.clear_field(self.TEXT_AREA)
 
 
-
-
-
-
-
+    def check_result(self, emp_id: int):
+        try:
+            self.wait_until_visible(self.RESULT_SECTION)
+            row = self.find_element(f'.//td[text()="{emp_id}"]/..')
+            return row.text
+        except:
+            return False
