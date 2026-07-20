@@ -10,8 +10,8 @@ class SQLPage(BasePage):
 
     PATH = '/ui/sql'
     TEXT_AREA = '//textarea[@id="sql-input"]'
-    QUERY_RADIO_BUTTON = '//button[@id="query-radio"]'
-    COMMAND_RADIO_BUTTON = '//button[@id="command-radio"]'
+    QUERY_RADIO_BUTTON = '//input[@id="query-radio"]'
+    COMMAND_RADIO_BUTTON = '//input[@id="command-radio"]'
     SEND_REQUEST_BUTTON = '//button[@id="send-request"]'
 
     def send_sql_query_or_command(self,  text: str, button: Literal['query', 'command']) -> None:
