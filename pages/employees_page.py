@@ -11,9 +11,19 @@ class EmployeePage(BasePage):
         self.header = Header(driver, self)
 
     PATH = '/ui/employees'
-    VIEW_BUTTON = './/svg[@class="icon eye-icon"]'
-    UPDATE_INFO_BUTTON = './/svg[@class="icon pencil-icon  "]'
-    DELETE_BUTTON = './/svg[@class="icon trash-icon  "]'
+    VIEW_BUTTON = './/*[contains(@class, "eye-icon")]'
+    UPDATE_INFO_BUTTON = './/*[contains(@class, "pencil-icon")]'
+    DELETE_BUTTON = './/*[contains(@class, "trash-icon")]'
+    CONTENT_WINDOW = '//div[@class="modal-content"]'
+    NAME_FIELD = '//input[@id="editName"]'
+    SALARY_FIELD = '//input[@id="editSalary"]'
+    WORK_STATUS_CHECKBOX = '//input[@id="editWorkStatus"]'
+    SUBMIT_BUTTON = '//button[@type="submit"]'
+    CONFIRM_DELETE_BUTTON = '//button[@id="confirmDeleteBtn"]'
+    CANCEL_DELETE_BUTTON = '//button[@id="cancelDeleteBtn"]'
+    VIEW_MODAL = '//div[@id="viewModal"]'
+    UPDATE_MODAL = '//div[@id="editModal"]'
+    DELETE_MODAL = '//div[@id="deleteModal"]'
 
     def get_employee_item(self, emp_id: int = 2) -> str:
         return f'//div[@data-employee-id="{str(emp_id)}"]'
