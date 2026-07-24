@@ -55,58 +55,25 @@ def home_page(browser, admin_token):
     page.open()
     return page
 
-
-@pytest.fixture(scope='function', params=[AdminPage, EmployeePage, CompanyPage, SQLPage])
-def pages_admin_token(request, browser, admin_token):
-    browser.get(BasePage.BASE_URL)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
-    page = request.param(browser)
-    page.open()
-    yield page
-
-
 @pytest.fixture(scope='function')
-def page_specific_admin_token(browser, admin_token):
-    def open_page(page_name: Literal['AdminPage', 'EmployeePage', 'CompanyPage', 'SQLPage']) -> AdminPage|EmployeePage|CompanyPage|SQLPage:
-        pages_dict = {'AdminPage': AdminPage,
-                      'EmployeePage': EmployeePage,
-                      'CompanyPage': CompanyPage,
-                      'SQLPage': SQLPage}
-        if page_name not in pages_dict:
-            raise ValueError(f'Страницы {page_name} не существует')
-        selected_page = pages_dict[page_name]
+def pages_admin_token(browser, admin_token):
+    def open_page(page_name) ->  AdminPage|EmployeePage|CompanyPage|SQLPage:
         browser.get(BasePage.BASE_URL)
         browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
-        page = selected_page(browser)
+        page = page_name(browser)
         page.open()
         return page
     return open_page
-
-
-@pytest.fixture(scope='function', params=[EmployeePage, CompanyPage, SQLPage])
-def pages_user_token(request, browser, user_token):
-    browser.get(BasePage.BASE_URL)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
-    page = request.param(browser)
-    page.open()
-    yield page
 
 @pytest.fixture(scope='function')
-def page_specific_user_token(browser, user_token):
-    def open_page(page_name: Literal['EmployeePage','CompanyPage','SQLPage']) -> EmployeePage|CompanyPage|SQLPage:
-        pages_dict = {'EmployeePage': EmployeePage,
-                      'CompanyPage': CompanyPage,
-                      'SQLPage': SQLPage}
-        if page_name not in pages_dict:
-            raise ValueError(f'Страницы {page_name} не существует')
-        selected_page = pages_dict[page_name]
+def pages_user_token(browser, user_token):
+    def open_page(page_name) -> EmployeePage|CompanyPage|SQLPage:
         browser.get(BasePage.BASE_URL)
         browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
-        page = selected_page(browser)
+        page = page_name(browser)
         page.open()
         return page
     return open_page
-
 
 @pytest.fixture(scope='function')
 def delete_from_db():
@@ -126,7 +93,6 @@ def delete_from_db():
         conn.commit()
         conn.close()
     return _delete
-
 
 @pytest.fixture(scope='function')
 def db_check_obj():
@@ -161,5 +127,3 @@ def clean_table_db():
         conn.commit()
         conn.close()
     return _clean
-
-

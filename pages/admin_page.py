@@ -24,9 +24,9 @@ class AdminPage(BasePage):
 
 
 
-    def click_role_change_button(self, usr_id: int, role_val: str):
-        self.click_element(self.get_select_role(usr_id))
-        self.click_element(self.get_role_option(usr_id, role_val))
+    def click_role_change_button(self, user_id: int, role_value: str):
+        self.click_element(self.get_select_role(user_id))
+        self.click_element(self.get_role_option(user_id, role_value))
 
 
     def click_delete_user_button(self, usr_id: int):
