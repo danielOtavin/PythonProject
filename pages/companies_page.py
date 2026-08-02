@@ -1,4 +1,5 @@
 from typing import Literal
+from enum import Enum
 from selenium.webdriver.common.by import By
 from webdriver_manager.core import driver
 
@@ -7,11 +8,20 @@ from pages.base_page import BasePage
 from pages.components.header import Header
 
 
+class ContentButton(Enum):
+    UPDATE = "update"
+    VIEW = "view"
+    DELETE = "DELETE"
+    
+
 '''переписать локаторы и разделить метод на отдельные'''
-class CompanyPage(BasePage):
+class CompanyPage(Header):
     def __init__(self, driver):
         super().__init__(driver)
-        self.header = Header(driver, self)
+        self.options =  {
+                            'view': (self.VIEW_BUTTON, self.VIEW_MODAL),
+                            'update': (self.UPDATE_INFO_BUTTON, self.UPDATE_MODAL)
+                        }
 
     PATH = '/ui/companies'
     VIEW_BUTTON = './/*[contains(@class, "eye-icon")]'
@@ -25,11 +35,12 @@ class CompanyPage(BasePage):
     COUNTRY_FIELD = '//input[@id="editCountry"]'
     SUBMIT_BUTTON = '//BUTTON[@type="submit"]'
     DELETE_EMPLOYEE_VIEW = './/*[contains(@class, "icon remove-icon")]'
+    COMPANY_ITEM_BY_ID = '//div[@data-company-id="{cmp_id}"]'
 
     def get_company_item(self, cmp_id: int):
-        return f'//div[@data-company-id="{str(cmp_id)}"]'
-
-    def open_content_window(self, cmp_id: int, button: Literal['view', 'update', 'delete']):
+        return self.COMPANY_ITEM_BY_ID.format(cmp_id=cmp_id)
+    
+    def open_content_window(self, cmp_id: int, button: ContentButton):
         company_card = self.find_element(self.get_company_item(cmp_id))
 
         if button == 'delete':
@@ -37,11 +48,8 @@ class CompanyPage(BasePage):
             self.click_element(btn)
             self.accept_alert()
         else:
-            options = {
-                'view': (self.VIEW_BUTTON, self.VIEW_MODAL),
-                'update': (self.UPDATE_INFO_BUTTON, self.UPDATE_MODAL)
-            }
-            pick_button, modal = options[button]
+           
+            pick_button, modal = self.options[button]
             btn = company_card.find_element(By.XPATH, pick_button)
             self.click_element(btn)
             self.wait_until_visible(modal)

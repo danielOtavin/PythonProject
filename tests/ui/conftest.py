@@ -1,5 +1,7 @@
 import sqlite3
-from typing import Literal, Callable
+from typing import Generator, Literal, Callable
+from api.token import Token
+import time
 
 import pytest
 from selenium.webdriver.ie.webdriver import WebDriver
@@ -75,23 +77,49 @@ def pages_user_token(browser, user_token):
         return page
     return open_page
 
+@pytest.fixture
+def open_page(request, browser) -> Generator[BasePage]:
+    page, user = request.param
+    token = Token().get_token(user=user)
+    ready_page = page(browser)
+    ready_page.open()
+    browser.execute_script(f"window.localStorage.setItem('authToken', '{token}');")
+    ready_page.open()
+    yield ready_page
+    browser.execute_script(f"window.localStorage.setItem('authToken', 'null');")
+
+class DB:
+    conn: sqlite3.Connection
+    cursor: sqlite3.Cursor
+
+    def __init__(self, conn, cursor):
+        self.conn = conn
+        self.cursor = cursor
+
+@pytest.fixture(scope='session')
+def db() -> Generator[DB]:
+    conn = sqlite3.connect('course.db')
+    cursor = conn.cursor()
+
+    database = DB(conn=conn, cursor=cursor)
+    yield database
+    
+    conn.close()
+
 @pytest.fixture(scope='function')
-def delete_from_db():
+def delete_from_db(db):
     def _delete(table_name: Literal['user', 'employee', 'company'], obj_name):
         field_dict = {'user': 'login',
                       'employee': 'name',
                       'company': 'name'}
-        conn = sqlite3.connect('course.db')
-        cursor = conn.cursor()
         if table_name not in field_dict:
             raise ValueError(f'Несуществующая таблица: {table_name}')
         field = field_dict[table_name]
-        cursor.execute(f'SELECT * FROM {table_name} WHERE {field} = ?', (obj_name,))
-        if not cursor.fetchone():
+        db.cursor.execute(f'SELECT * FROM {table_name} WHERE {field} = ?', (obj_name,))
+        if not db.fetchone():
             raise ValueError(f'Объект {obj_name} не найден в {table_name}')
-        cursor.execute(f'DELETE FROM {table_name} WHERE {field} = ?', (obj_name,))
-        conn.commit()
-        conn.close()
+        db.cursor.execute(f'DELETE FROM {table_name} WHERE {field} = ?', (obj_name,))
+        db.conn.commit()
     return _delete
 
 @pytest.fixture(scope='function')
@@ -113,17 +141,14 @@ def db_check_obj():
     return check_name
 
 @pytest.fixture(scope='function')
-def clean_table_db():
+def clean_table_db(db):
     def _clean(table_name: Literal['user', 'employee', 'company']):
-        conn = sqlite3.connect('course.db')
-        cursor = conn.cursor()
         script_dict = {'user': "DELETE FROM user WHERE login != 'admin'",
                        'employee': "DELETE FROM employee",
                        'company': "DELETE FROM company"}
         if table_name not in script_dict:
             raise ValueError(f'Несуществующая таблица: {table_name}')
         script = script_dict[table_name]
-        cursor.execute(script)
-        conn.commit()
-        conn.close()
+        db.cursor.execute(script)
+        db.conn.commit()
     return _clean

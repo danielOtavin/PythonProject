@@ -6,10 +6,9 @@ from pages.base_page import BasePage
 from pages.components.header import Header
 
 
-class SQLPage(BasePage):
+class SQLPage(Header):
     def __init__(self, driver):
         super().__init__(driver)
-        self.header = Header(driver, self)
 
     PATH = '/ui/sql'
     TEXT_AREA = '//textarea[@id="sql-input"]'

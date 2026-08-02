@@ -4,10 +4,9 @@ from pages.base_page import BasePage
 from pages.components.header import Header
 
 
-class HomePage(BasePage):
+class HomePage(Header):
     def __init__(self, driver):
         super().__init__(driver)
-        self.header = Header(driver, self)
 
     PATH = '/ui/home'
     EMPLOYEES_BUTTON = '//a[@href="/ui/employees"]'

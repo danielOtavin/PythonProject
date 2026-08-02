@@ -3,10 +3,9 @@ from pages.components.header import Header
 from pages.home_page import HomePage
 
 
-class LoginPage(BasePage):
+class LoginPage(Header):
     def __init__(self, driver):
         super().__init__(driver)
-        self.header = Header(driver, self)
 
     PATH = '/ui/login'
     USERNAME = '//input[@name="username"]'
