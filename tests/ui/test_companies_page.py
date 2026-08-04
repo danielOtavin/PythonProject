@@ -1,11 +1,8 @@
-import sqlite3
-
 import pytest
 
 from models.companies import Company
-from models.employees import Employee
+from models.users import ADMIN
 from pages.companies_page import CompanyPage
-from tests.conftest import admin_token, company_api, employee_api
 
 
 class TestCompaniesPage:
@@ -21,25 +18,27 @@ class TestCompaniesPage:
     #     companies_page.delete_employee_from_company_via_view_window(company.id, employee.id)
     #     assert db_check_obj('employee', employee.name) == []
 
-    def test_update_company_info(self, clean_table_db, admin_token, company_api, db_check_obj, browser,
-                                 pages_admin_token):
+    @pytest.mark.parametrize('open_page', [(CompanyPage, ADMIN)], indirect=True)
+    def test_update_company_info(self, clean_table_db, admin_token, company_api, db_check_obj,
+                                 open_page: CompanyPage):
         clean_table_db('employee')
         clean_table_db('company')
         company = company_api.create_company(admin_token, Company.random_company())
         company_data_upd = Company.random_company()
-        company_page = pages_admin_token(CompanyPage)
-        company_page.wait_until_visible(company_page.get_company_item(company.id))
-        company_page.update_company_data(company.id, company_data_upd)
+        open_page.page_refresh()
+        open_page.wait_until_visible(open_page.get_company_item(company.id))
+        open_page.update_company_data(company.id, company_data_upd)
         assert db_check_obj('company', company_data_upd.name) != []
 
+    @pytest.mark.parametrize('open_page', [(CompanyPage, ADMIN)], indirect=True)
     def test_delete_company_info(self, clean_table_db, admin_token, company_api, db_check_obj, browser,
-                                 pages_admin_token):
+                                 open_page: CompanyPage):
         clean_table_db('employee')
         clean_table_db('company')
         company = company_api.create_company(admin_token, Company.random_company())
-        company_page = pages_admin_token(CompanyPage)
-        company_page.wait_until_visible(company_page.get_company_item(company.id))
-        company_page.delete_company_data(company.id)
+        open_page.page_refresh()
+        open_page.wait_until_visible(open_page.get_company_item(company.id))
+        open_page.delete_company_data(company.id)
         assert db_check_obj('company', company.id) == []
 
 

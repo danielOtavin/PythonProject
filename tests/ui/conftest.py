@@ -1,30 +1,27 @@
 import sqlite3
-from typing import Generator, Literal, Callable
+from typing import Generator, Literal
 from api.token import Token
-import time
 
 import pytest
-from selenium.webdriver.ie.webdriver import WebDriver
 
 from browsers import ChromeManager, FirefoxManager, EdgeManager
-from pages.admin_page import AdminPage
+from config import Config
 from pages.base_page import BasePage
-from pages.companies_page import CompanyPage
-from pages.employees_page import EmployeePage
 from pages.home_page import HomePage
 from pages.login_page_ import LoginPage
 from pages.signup_page import SignupPage
-from pages.sql_page import SQLPage
 
 
 @pytest.fixture(scope='session', params=[ChromeManager, FirefoxManager, EdgeManager])
-def browser(request) -> WebDriver:
+def browser(request) -> Generator[BasePage]:
     manager = request.param()
     browser = manager.get_driver()
     browser.maximize_window()
     yield browser
     browser.quit()
 
+def local_storage_script(browser, token: str):
+    return browser.execute_script(f"window.localStorage.setItem('authToken', '{token}');")
 
 @pytest.fixture(scope='function', params=['admin_token', 'user_token'])
 def authorization(browser, request, admin_token, user_token) -> HomePage:
@@ -32,7 +29,7 @@ def authorization(browser, request, admin_token, user_token) -> HomePage:
     token = request.getfixturevalue(token_name)
     home_page = HomePage(browser)
     browser.get(BasePage.BASE_URL)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{token}');")
+    local_storage_script(browser, token)
     home_page.open()
     return home_page
 
@@ -52,30 +49,10 @@ def signup_page(browser) -> SignupPage:
 @pytest.fixture(scope='function')
 def home_page(browser, admin_token):
     browser.get(BasePage.BASE_URL)
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
+    local_storage_script(browser, admin_token)
     page = HomePage(browser)
     page.open()
     return page
-
-@pytest.fixture(scope='function')
-def pages_admin_token(browser, admin_token):
-    def open_page(page_name) ->  AdminPage|EmployeePage|CompanyPage|SQLPage:
-        browser.get(BasePage.BASE_URL)
-        browser.execute_script(f"window.localStorage.setItem('authToken', '{admin_token}');")
-        page = page_name(browser)
-        page.open()
-        return page
-    return open_page
-
-@pytest.fixture(scope='function')
-def pages_user_token(browser, user_token):
-    def open_page(page_name) -> EmployeePage|CompanyPage|SQLPage:
-        browser.get(BasePage.BASE_URL)
-        browser.execute_script(f"window.localStorage.setItem('authToken', '{user_token}');")
-        page = page_name(browser)
-        page.open()
-        return page
-    return open_page
 
 @pytest.fixture
 def open_page(request, browser) -> Generator[BasePage]:
@@ -83,10 +60,10 @@ def open_page(request, browser) -> Generator[BasePage]:
     token = Token().get_token(user=user)
     ready_page = page(browser)
     ready_page.open()
-    browser.execute_script(f"window.localStorage.setItem('authToken', '{token}');")
+    local_storage_script(browser, token)
     ready_page.open()
     yield ready_page
-    browser.execute_script(f"window.localStorage.setItem('authToken', 'null');")
+    local_storage_script(browser, 'null')
 
 class DB:
     conn: sqlite3.Connection
@@ -98,7 +75,7 @@ class DB:
 
 @pytest.fixture(scope='session')
 def db() -> Generator[DB]:
-    conn = sqlite3.connect('course.db')
+    conn = sqlite3.connect(Config.db)
     cursor = conn.cursor()
 
     database = DB(conn=conn, cursor=cursor)

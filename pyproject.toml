@@ -28,4 +28,8 @@ addopts = [
     "-s",
     "--tb=short"
 ]
+markers = [
+    "sql",
+    "home_page",
+]
 testpaths = ["tests"]

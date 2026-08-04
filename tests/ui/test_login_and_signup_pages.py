@@ -7,9 +7,12 @@ class TestLoginPage:
     @allure.story('Авторизация и регистрация')
     @allure.title('Тестирование регистрации и авторизации нового пользователя')
     def test_signup_and_login_ui(self, signup_page, browser):
-        user = User.random_user()
-        login_page = signup_page.input_login_and_password(user.login, user.password)
-        login_page.authorization(user.login, user.password)
+        with allure.step('Создать данные пользователя'):
+            user = User.random_user()
+        with allure.step('Ввести данные пользователя на странице создания пользователя'):
+            login_page = signup_page.registration(user.login, user.password)
+        with allure.step('Авторизоваться с данными пользователя'):
+            login_page.authorization(user.login, user.password)
 
 
 

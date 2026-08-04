@@ -11,7 +11,7 @@ from pytest import mark
 class TestEmployeesPage:
     @mark.parametrize('open_page', [(SQLPage, ADMIN)], indirect=True)
     def test_query_and_command_ui(self, admin_token, open_page: SQLPage, employee_api):
-        with step('создаnm случайного сотрудника'):
+        with step('создать случайного сотрудника'):
             employee_data = Employee.random_employee()
             employee_create = employee_api.create_employee(admin_token, employee_data)
 
