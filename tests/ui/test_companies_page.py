@@ -3,8 +3,9 @@ import pytest
 from models.companies import Company
 from models.users import ADMIN
 from pages.companies_page import CompanyPage
+from pytest import mark
 
-
+@mark.companies
 class TestCompaniesPage:
     # def test_delete_employee_via_company(self, clean_table_db, employee_api, admin_token, structure_api, company_api, browser,
     #                   pages_admin_token, db_check_obj):
@@ -19,10 +20,8 @@ class TestCompaniesPage:
     #     assert db_check_obj('employee', employee.name) == []
 
     @pytest.mark.parametrize('open_page', [(CompanyPage, ADMIN)], indirect=True)
-    def test_update_company_info(self, clean_table_db, admin_token, company_api, db_check_obj,
+    def test_update_company_info(self, clean_companies_db, clean_employees_db, admin_token, company_api, db_check_obj,
                                  open_page: CompanyPage):
-        clean_table_db('employee')
-        clean_table_db('company')
         company = company_api.create_company(admin_token, Company.random_company())
         company_data_upd = Company.random_company()
         open_page.page_refresh()

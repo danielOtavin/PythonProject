@@ -10,6 +10,7 @@ from pages.base_page import BasePage
 from pages.home_page import HomePage
 from pages.login_page_ import LoginPage
 from pages.signup_page import SignupPage
+from dbase.data_base import DB, TableName
 
 
 @pytest.fixture(scope='session', params=[ChromeManager, FirefoxManager, EdgeManager])
@@ -65,13 +66,6 @@ def open_page(request, browser) -> Generator[BasePage]:
     yield ready_page
     local_storage_script(browser, 'null')
 
-class DB:
-    conn: sqlite3.Connection
-    cursor: sqlite3.Cursor
-
-    def __init__(self, conn, cursor):
-        self.conn = conn
-        self.cursor = cursor
 
 @pytest.fixture(scope='session')
 def db() -> Generator[DB]:
@@ -99,33 +93,32 @@ def delete_from_db(db):
         db.conn.commit()
     return _delete
 
-@pytest.fixture(scope='function')
-def db_check_obj():
-    def check_name(table_name: Literal['user', 'employee', 'company'], obj_name: str):
-        field_dict = {'user': 'login',
-                      'employee': 'name',
-                      'company': 'name'}
-        conn = sqlite3.connect('course.db')
-        cursor = conn.cursor()
-        if table_name not in field_dict:
-            raise ValueError(f'Несуществующая таблица: {table_name}')
-        field = field_dict[table_name]
+# @pytest.fixture(scope='function')
+# def db_check_obj():
+#     def check_name(table_name: Literal['user', 'employee', 'company'], obj_name: str):
+#         field_dict = {'user': 'login',
+#                       'employee': 'name',
+#                       'company': 'name'}
+#         conn = sqlite3.connect('course.db')
+#         cursor = conn.cursor()
+#         if table_name not in field_dict:
+#             raise ValueError(f'Несуществующая таблица: {table_name}')
+#         field = field_dict[table_name]
+#
+#         cursor.execute(f'SELECT * FROM {table_name} WHERE {field} = ?', (obj_name,))
+#         result = cursor.fetchall()
+#         conn.close()
+#         return result
+#     return check_name
 
-        cursor.execute(f'SELECT * FROM {table_name} WHERE {field} = ?', (obj_name,))
-        result = cursor.fetchall()
-        conn.close()
-        return result
-    return check_name
+@pytest.fixture(scope='function')
+def clean_users_db(db):
+    return db.clean_table(TableName.USER)
 
 @pytest.fixture(scope='function')
-def clean_table_db(db):
-    def _clean(table_name: Literal['user', 'employee', 'company']):
-        script_dict = {'user': "DELETE FROM user WHERE login != 'admin'",
-                       'employee': "DELETE FROM employee",
-                       'company': "DELETE FROM company"}
-        if table_name not in script_dict:
-            raise ValueError(f'Несуществующая таблица: {table_name}')
-        script = script_dict[table_name]
-        db.cursor.execute(script)
-        db.conn.commit()
-    return _clean
+def clean_companies_db(db):
+    return db.clean_table(TableName.COMPANY)
+
+@pytest.fixture(scope='function')
+def clean_employees_db(db):
+    return db.clean_table(TableName.EMPLOYEE)
