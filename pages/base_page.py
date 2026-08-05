@@ -54,6 +54,7 @@ class BasePage:
         if isinstance(fields, tuple):
             fields = [fields]
         for path, value in fields:
+            self.clear_field(path)
             self.wait_until_clickable(path).send_keys(value)
 
     @step('Получить текст')

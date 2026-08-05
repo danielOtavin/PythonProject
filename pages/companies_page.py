@@ -78,9 +78,11 @@ class CompanyPage(Header):
     def delete_company_data(self, cmp_id: int):
         company_card = self.find_element(self.get_company_item(cmp_id))
         btn = company_card.find_element(By.XPATH, self.DELETE_BUTTON)
+        self.page_refresh()
         self.click_element(btn)
         self.accept_alert()
         self.wait_until_invisible(self.DATA_ID_ROW.format(id=cmp_id))
+
 
 
 

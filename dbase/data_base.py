@@ -24,10 +24,10 @@ class DB:
         self.conn.commit()
 
     def check_object_in_db(self, table_name: TableName, obj_id: int):
-        self.cursor.execute(f'SELECT * FROM {table_name} WHERE id = ?', (obj_id,))
+        self.cursor.execute(f'SELECT * FROM {table_name.value} WHERE id = ?', (obj_id,))
         result = self.cursor.fetchall()
         return result
 
-
+    # def delete_obj(self, ):
 
 

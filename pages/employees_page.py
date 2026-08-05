@@ -64,8 +64,10 @@ class EmployeePage(Header):
     @step('Обновить данные сотрудника {emp_id}')
     def update_employee_data(self, emp_id: int, employee_data: Employee) -> None:
         self.open_content_window(emp_id, OptionsButton.UPDATE)
-        self.input_value((self.NAME_FIELD, str(employee_data.name)),
-                         (self.SALARY_FIELD, str(employee_data.salary)))
+        self.input_value([
+            (self.NAME_FIELD, str(employee_data.name)),
+            (self.SALARY_FIELD, str(employee_data.salary))
+        ])
         self.set_checkbox(self.WORK_STATUS_CHECKBOX, employee_data.work)
         self.click_element(self.SUBMIT_BUTTON)
         self.wait_until_invisible(self.CONTENT_WINDOW)
